@@ -4,10 +4,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RegistrationLoginSpringBootSecurityThymeleafApplication {
+public class RegistrationLoginSpringBoot
+{
 
 	public static void main(String[] args) {
-		SpringApplication.run(RegistrationLoginSpringBootSecurityThymeleafApplication.class, args);
+		SpringApplication.run(RegistrationLoginSpringBoot.class, args);
 	}
 
 }
