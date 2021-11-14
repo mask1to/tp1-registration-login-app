@@ -3,6 +3,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import net.javaguides.springboot.web.dto.UserEmailDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,7 +30,6 @@ public class UserServiceImpl implements UserService {
 		this.userRepository = userRepository;
 	}
 
-
 	@Override
 	public User save(UserRegistrationDto registrationDto) {
 		User user=new User(registrationDto.getFirstName(),
@@ -38,6 +38,14 @@ public class UserServiceImpl implements UserService {
 							passwordEncoder.encode(registrationDto.getPassword()), 
 							Arrays.asList(new Role("ROLE_USER")));
 		
+		return userRepository.save(user);
+	}
+
+	@Override
+	public User saveEmail(UserEmailDto userEmailDto) {
+		User user=new User(userEmailDto.getEmail(),
+				Arrays.asList(new Role("ROLE_USER")));
+
 		return userRepository.save(user);
 	}
 
@@ -50,7 +58,7 @@ public class UserServiceImpl implements UserService {
 		
 		if(user==null)
 		{
-			throw new UsernameNotFoundException("Invalid Username or password");			
+			throw new UsernameNotFoundException("Invalid Email or password");
 		}
 		return new org.springframework.security.core.userdetails.User(user.getEmail(),user.getPassword(),mapRolesToAuthorities(user.getRoles()));
 	}

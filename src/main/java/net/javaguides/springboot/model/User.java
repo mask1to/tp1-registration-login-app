@@ -1,6 +1,7 @@
 package net.javaguides.springboot.model;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -53,7 +54,13 @@ public class User
 		this.roles = roles;
 	}
 
-	public Long getId() {
+	public User(String email, Collection<Role> roles) {
+		super();
+		this.email = email;
+		this.roles = roles;
+	}
+
+    public Long getId() {
 		return id;
 	}
 
@@ -107,6 +114,4 @@ public class User
 				+ ", password=" + password + ", roles=" + roles + "]";
 	}
 
-	
-	
 }
