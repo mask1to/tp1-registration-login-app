@@ -1,13 +1,19 @@
 package net.javaguides.springboot.web;
 
+import net.javaguides.springboot.model.TemporaryUser;
 import net.javaguides.springboot.service.UserService;
 import net.javaguides.springboot.web.dto.UserEmailDto;
 import net.javaguides.springboot.web.dto.UserRegistrationDto;
+import net.javaguides.springboot.web.exceptions.UserAlreadyExistAuthenticationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/welcome")
@@ -16,6 +22,9 @@ public class UserLandingController
 
     private UserService userService;
 
+    @Autowired
+    ApplicationEventPublisher eventPublisher;
+
     public UserLandingController(UserService userService)
     {
         super();
@@ -23,9 +32,9 @@ public class UserLandingController
     }
 
     @ModelAttribute("user")
-    public UserRegistrationDto UserRegistrationDto()
+    public UserEmailDto userEmailDto()
     {
-        return new UserRegistrationDto();
+        return new UserEmailDto();
     }
 
     @GetMapping
@@ -35,9 +44,18 @@ public class UserLandingController
     }
 
     @PostMapping
-    public String registerUserAccountTemp(@ModelAttribute("user") UserEmailDto userEmailDto)
+    public String registerUserAccountTemp(@ModelAttribute("user") UserEmailDto userEmailDto, HttpServletRequest request)
     {
-        userService.saveEmail(userEmailDto);
-        return "redirect:/login?success";
+        try {
+            TemporaryUser temporaryUser = userService.saveEmail(userEmailDto);
+
+            String appUrl = request.getContextPath();
+            eventPublisher.publishEvent(new OnRegistrationCompleteEvent(temporaryUser,
+                    request.getLocale(), appUrl));
+        }
+        catch(UserAlreadyExistAuthenticationException e) {
+            return "redirect:/welcome?exist";
+        }
+        return "redirect:/welcome?success";
     }
 }

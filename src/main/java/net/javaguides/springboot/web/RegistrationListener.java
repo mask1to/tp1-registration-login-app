@@ -1,5 +1,6 @@
 package net.javaguides.springboot.web;
 
+import net.javaguides.springboot.model.TemporaryUser;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,19 +23,19 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
     @Autowired
     private MessageSource messages;
 
-    /*@Autowired
-    private JavaMailSender mailSender;*/
+    @Autowired
+    private JavaMailSender mailSender;
 
     @Override
     public void onApplicationEvent(OnRegistrationCompleteEvent event) {
         this.confirmRegistration(event);
     }
     private void confirmRegistration(OnRegistrationCompleteEvent event) {
-        User user = event.getUser();
+        TemporaryUser temporaryUser = event.getTemporaryUser();
         String token = UUID.randomUUID().toString();
-        service.createVerificationToken(user, token);
+        service.createVerificationToken(temporaryUser, token);
 
-        String recipientAddress = user.getEmail();
+        String recipientAddress = temporaryUser.getEmail();
         String subject = "Registration Confirmation";
         String confirmationUrl
                 = event.getAppUrl() + "/registrationConfirm?token=" + token;
@@ -44,7 +45,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
         email.setTo(recipientAddress);
         email.setSubject(subject);
         email.setText("\r\n" + "http://localhost:8081" + confirmationUrl);
-        System.out.println(email);
+        mailSender.send(email);
     }
 
 }

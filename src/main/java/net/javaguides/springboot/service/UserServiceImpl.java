@@ -3,7 +3,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import net.javaguides.springboot.model.TemporaryUser;
 import net.javaguides.springboot.model.VerificationToken;
+import net.javaguides.springboot.repository.TemporaryUserRepository;
 import net.javaguides.springboot.repository.VerificationTokenRepository;
 import net.javaguides.springboot.web.dto.UserEmailDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import net.javaguides.springboot.web.dto.UserRegistrationDto;
 public class UserServiceImpl implements UserService {
 
 	private UserRepository userRepository;
+	private TemporaryUserRepository temporaryUserRepository;
 
 	@Autowired
 	private VerificationTokenRepository tokenRepository;
@@ -30,9 +33,10 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
-	public UserServiceImpl(UserRepository userRepository) {
+	public UserServiceImpl(UserRepository userRepository, TemporaryUserRepository temporaryUserRepository) {
 		super();
 		this.userRepository = userRepository;
+		this.temporaryUserRepository = temporaryUserRepository;
 	}
 
 	@Override
@@ -41,23 +45,22 @@ public class UserServiceImpl implements UserService {
 							registrationDto.getLastName(), 
 							registrationDto.getEmail(),
 							passwordEncoder.encode(registrationDto.getPassword()), 
-							Arrays.asList(new Role("ROLE_USER")));
+							Arrays.asList(new Role("USER")));
 		
 		return userRepository.save(user);
 	}
 
 	@Override
-	public User saveEmail(UserEmailDto userEmailDto) {
-		User user=new User(userEmailDto.getEmail(),
-				Arrays.asList(new Role("ROLE_USER")));
+	public TemporaryUser saveEmail(UserEmailDto userEmailDto) {
+		TemporaryUser temporaryUser = new TemporaryUser(userEmailDto.getEmail(), Arrays.asList(new Role("TEMP_USER")));
 
-		return userRepository.save(user);
+		return temporaryUserRepository.save(temporaryUser);
 	}
 
 	@Override
-	public User getUser(String verificationToken) {
-		User user = tokenRepository.findByToken(verificationToken).getUser();
-		return user;
+	public TemporaryUser getTemporaryUser(String verificationToken) {
+		TemporaryUser temporaryUser = tokenRepository.findByToken(verificationToken).getTemporaryUser();
+		return temporaryUser;
 	}
 
 	@Override
@@ -66,14 +69,14 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void createVerificationToken(User user, String token) {
-		VerificationToken myToken = new VerificationToken(token, user);
+	public void createVerificationToken(TemporaryUser temporaryUser, String token) {
+		VerificationToken myToken = new VerificationToken(token, temporaryUser);
 		tokenRepository.save(myToken);
 	}
 
 	@Override
-	public void saveRegisteredUser(User user) {
-		userRepository.save(user);
+	public void saveRegisteredUser(TemporaryUser temporaryUser) {
+		temporaryUserRepository.save(temporaryUser);
 	}
 
 

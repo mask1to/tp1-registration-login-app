@@ -1,5 +1,6 @@
 package net.javaguides.springboot.web;
 
+import net.javaguides.springboot.model.TemporaryUser;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.model.VerificationToken;
 import net.javaguides.springboot.service.UserService;
@@ -41,7 +42,7 @@ public class RegistrationConfirmController {
             //return "redirect:/badUser.html";
         }
 
-        User user = verificationToken.getUser();
+        TemporaryUser temporaryUser = verificationToken.getTemporaryUser();
         Calendar cal = Calendar.getInstance();
         if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
             //String messageValue = messages.getMessage("auth.message.expired", null, locale);
@@ -50,8 +51,8 @@ public class RegistrationConfirmController {
             //return "redirect:/badUser.html";
         }
 
-        user.setEnabled(true);
-        service.saveRegisteredUser(user);
-        return "/welcome";
+        temporaryUser.setEnabled(true);
+        service.saveRegisteredUser(temporaryUser);
+        return "/login";
     }
 }

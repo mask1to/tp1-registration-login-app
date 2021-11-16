@@ -55,7 +55,7 @@ public class User
 		this.email = email;
 		this.password = password;
 		this.roles = roles;
-		this.enabled = false;
+		this.enabled = true;
 	}
 
 	public User(String email, Collection<Role> roles) {

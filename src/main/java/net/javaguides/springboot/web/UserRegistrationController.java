@@ -47,14 +47,10 @@ public class UserRegistrationController {
 	}
 	
 	@PostMapping
-	public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto, HttpServletRequest request)
+	public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto)
 	{
 		try {
-			User registered = userService.save(registrationDto);
-
-			String appUrl = request.getContextPath();
-			eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered,
-					request.getLocale(), appUrl));
+			userService.save(registrationDto);
 		}
 		catch(UserAlreadyExistAuthenticationException e) {
 			return "redirect:/registration?exist";

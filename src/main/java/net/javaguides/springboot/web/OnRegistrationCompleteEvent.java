@@ -1,5 +1,6 @@
 package net.javaguides.springboot.web;
 
+import net.javaguides.springboot.model.TemporaryUser;
 import net.javaguides.springboot.model.User;
 import org.springframework.context.ApplicationEvent;
 
@@ -9,13 +10,13 @@ public class OnRegistrationCompleteEvent extends ApplicationEvent {
 
     private String appUrl;
     private Locale locale;
-    private User user;
+    private TemporaryUser temporaryUser;
 
     public OnRegistrationCompleteEvent(
-            User user, Locale locale, String appUrl) {
-        super(user);
+            TemporaryUser temporaryUser, Locale locale, String appUrl) {
+        super(temporaryUser);
 
-        this.user = user;
+        this.temporaryUser = temporaryUser;
         this.locale = locale;
         this.appUrl = appUrl;
     }
@@ -36,11 +37,11 @@ public class OnRegistrationCompleteEvent extends ApplicationEvent {
         this.locale = locale;
     }
 
-    public User getUser() {
-        return user;
+    public TemporaryUser getTemporaryUser() {
+        return temporaryUser;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setTemporaryUser(TemporaryUser temporaryUser) {
+        this.temporaryUser = temporaryUser;
     }
 }

@@ -37,12 +37,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authenticationProvider());
     }
-	
+	//.antMatchers("/registration**").access("hasRole('TEMP_USER')")
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers(
-				 "/registration**",
-	                "/welcome**",
+		http.authorizeRequests()
+				.antMatchers(
+				 "/welcome**",
 	                "/registrationConfirm**",
 	                "/js/**",
 	                "/css/**",
