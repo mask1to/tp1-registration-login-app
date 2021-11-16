@@ -39,6 +39,11 @@
 					<div class="alert alert-info">You've successfully registered!</div>
 				</div>
 
+				<!-- exist message -->
+				<div th:if="${param.exist}">
+					<div class="alert alert-danger">Email already exists</div>
+				</div>
+
 				<h1>Registration</h1>
 
 				<form th:action="@{/registration}" method="post" th:object="${user}">

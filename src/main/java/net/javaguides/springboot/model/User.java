@@ -35,6 +35,9 @@ public class User
 	private String email;
 	
 	private String password;
+
+	@Column(name = "enabled")
+	private boolean enabled;
 	
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(
@@ -52,6 +55,7 @@ public class User
 		this.email = email;
 		this.password = password;
 		this.roles = roles;
+		this.enabled = false;
 	}
 
 	public User(String email, Collection<Role> roles) {
@@ -114,4 +118,11 @@ public class User
 				+ ", password=" + password + ", roles=" + roles + "]";
 	}
 
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
 }

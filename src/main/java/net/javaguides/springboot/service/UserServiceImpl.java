@@ -3,6 +3,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import net.javaguides.springboot.model.VerificationToken;
+import net.javaguides.springboot.repository.VerificationTokenRepository;
 import net.javaguides.springboot.web.dto.UserEmailDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,6 +23,9 @@ import net.javaguides.springboot.web.dto.UserRegistrationDto;
 public class UserServiceImpl implements UserService {
 
 	private UserRepository userRepository;
+
+	@Autowired
+	private VerificationTokenRepository tokenRepository;
 	
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
@@ -47,6 +52,28 @@ public class UserServiceImpl implements UserService {
 				Arrays.asList(new Role("ROLE_USER")));
 
 		return userRepository.save(user);
+	}
+
+	@Override
+	public User getUser(String verificationToken) {
+		User user = tokenRepository.findByToken(verificationToken).getUser();
+		return user;
+	}
+
+	@Override
+	public VerificationToken getVerificationToken(String VerificationToken) {
+		return tokenRepository.findByToken(VerificationToken);
+	}
+
+	@Override
+	public void createVerificationToken(User user, String token) {
+		VerificationToken myToken = new VerificationToken(token, user);
+		tokenRepository.save(myToken);
+	}
+
+	@Override
+	public void saveRegisteredUser(User user) {
+		userRepository.save(user);
 	}
 
 
