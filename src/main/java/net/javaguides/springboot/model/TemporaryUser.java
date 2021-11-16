@@ -18,12 +18,12 @@ public class TemporaryUser {
     @Column(name = "enabled")
     private boolean enabled;
 
-    /*@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
-            name = "users_roles",
-            joinColumns = @JoinColumn(name = "temp_user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))*/
-    //private Collection<Role> roles;
+            name = "temp_users_roles",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private Collection<Role> roles;
 
     public TemporaryUser() {
 
@@ -32,14 +32,14 @@ public class TemporaryUser {
     public TemporaryUser(Long id, String email, boolean enabled, Collection<Role> roles) {
         this.id = id;
         this.email = email;
-        //this.roles = roles;
+        this.roles = roles;
         this.enabled = false;
     }
 
     public TemporaryUser(String email, Collection<Role> roles) {
         super();
         this.email = email;
-        //this.roles = roles;
+        this.roles = roles;
     }
 
     public Long getId() {
@@ -66,11 +66,22 @@ public class TemporaryUser {
         this.enabled = enabled;
     }
 
-    /*public Collection<Role> getRoles() {
+    @Override
+    public String toString()
+    {
+        return "TemporaryUser{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", enabled=" + enabled +
+                ", roles=" + roles +
+                '}';
+    }
+
+    public Collection<Role> getRoles() {
         return roles;
     }
 
     public void setRoles(Collection<Role> roles) {
         this.roles = roles;
-    }*/
+    }
 }

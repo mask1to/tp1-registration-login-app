@@ -26,6 +26,7 @@ public class UserServiceImpl implements UserService {
 
 	private UserRepository userRepository;
 	private TemporaryUserRepository temporaryUserRepository;
+	private VerificationTokenRepository verificationTokenRepository;
 
 	@Autowired
 	private VerificationTokenRepository tokenRepository;
@@ -33,10 +34,11 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
-	public UserServiceImpl(UserRepository userRepository, TemporaryUserRepository temporaryUserRepository) {
+	public UserServiceImpl(UserRepository userRepository, TemporaryUserRepository temporaryUserRepository, VerificationTokenRepository verificationTokenRepository) {
 		super();
 		this.userRepository = userRepository;
 		this.temporaryUserRepository = temporaryUserRepository;
+		this.verificationTokenRepository = verificationTokenRepository;
 	}
 
 	@Override
@@ -61,6 +63,26 @@ public class UserServiceImpl implements UserService {
 	public TemporaryUser getTemporaryUser(String verificationToken) {
 		TemporaryUser temporaryUser = tokenRepository.findByToken(verificationToken).getTemporaryUser();
 		return temporaryUser;
+	}
+
+	@Override
+	public TemporaryUser getTemporaryUserByMail(String mail)
+	{
+		TemporaryUser temporaryUser = temporaryUserRepository.findByEmail(mail);
+		return temporaryUser;
+	}
+
+	@Override
+	public void removeByMail(String mail)
+	{
+		TemporaryUser temporaryUser = temporaryUserRepository.findByEmail(mail);
+		temporaryUserRepository.delete(temporaryUser);
+	}
+
+	@Override
+	public void removeAllTokens()
+	{
+		verificationTokenRepository.deleteAll();
 	}
 
 	@Override
@@ -93,9 +115,13 @@ public class UserServiceImpl implements UserService {
 		return new org.springframework.security.core.userdetails.User(user.getEmail(),user.getPassword(),mapRolesToAuthorities(user.getRoles()));
 	}
 
+
+
 	private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles){
 		
 		return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
 	
 	}
+
+
 }

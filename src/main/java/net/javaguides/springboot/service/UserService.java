@@ -13,8 +13,11 @@ public interface UserService extends UserDetailsService {
 	User save(UserRegistrationDto registrationDto);
 	TemporaryUser saveEmail(UserEmailDto userEmailDto);
 	TemporaryUser getTemporaryUser(String verificationToken);
+	TemporaryUser getTemporaryUserByMail(String mail);
+
 	VerificationToken getVerificationToken(String VerificationToken);
 	void createVerificationToken(TemporaryUser temporaryUser, String token);
 	void saveRegisteredUser(TemporaryUser temporaryUser);
-
+	void removeByMail(String mail);
+	void removeAllTokens();
 }
