@@ -1,4 +1,6 @@
 package net.javaguides.springboot.service;
+import java.sql.Date;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -9,6 +11,7 @@ import net.javaguides.springboot.repository.TemporaryUserRepository;
 import net.javaguides.springboot.repository.VerificationTokenRepository;
 import net.javaguides.springboot.web.dto.UserEmailDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,7 +29,6 @@ public class UserServiceImpl implements UserService {
 
 	private UserRepository userRepository;
 	private TemporaryUserRepository temporaryUserRepository;
-	private VerificationTokenRepository verificationTokenRepository;
 
 	@Autowired
 	private VerificationTokenRepository tokenRepository;
@@ -34,11 +36,10 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
-	public UserServiceImpl(UserRepository userRepository, TemporaryUserRepository temporaryUserRepository, VerificationTokenRepository verificationTokenRepository) {
+	public UserServiceImpl(UserRepository userRepository, TemporaryUserRepository temporaryUserRepository) {
 		super();
 		this.userRepository = userRepository;
 		this.temporaryUserRepository = temporaryUserRepository;
-		this.verificationTokenRepository = verificationTokenRepository;
 	}
 
 	@Override
@@ -80,12 +81,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void removeAllTokens()
-	{
-		verificationTokenRepository.deleteAll();
-	}
-
-	@Override
 	public VerificationToken getVerificationToken(String VerificationToken) {
 		return tokenRepository.findByToken(VerificationToken);
 	}
@@ -101,11 +96,9 @@ public class UserServiceImpl implements UserService {
 		temporaryUserRepository.save(temporaryUser);
 	}
 
-
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException 
 	{
-		
 		User user=userRepository.findByEmail(username); 
 		
 		if(user==null)
@@ -115,13 +108,9 @@ public class UserServiceImpl implements UserService {
 		return new org.springframework.security.core.userdetails.User(user.getEmail(),user.getPassword(),mapRolesToAuthorities(user.getRoles()));
 	}
 
-
-
-	private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles){
-		
+	private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles)
+	{
 		return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
-	
 	}
-
 
 }

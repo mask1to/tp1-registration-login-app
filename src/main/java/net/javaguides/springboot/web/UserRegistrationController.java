@@ -4,6 +4,7 @@ import net.javaguides.springboot.model.TemporaryUser;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.model.VerificationToken;
 import net.javaguides.springboot.repository.TemporaryUserRepository;
+import net.javaguides.springboot.repository.VerificationTokenRepository;
 import net.javaguides.springboot.web.exceptions.UserAlreadyExistAuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,9 @@ import org.springframework.web.bind.annotation.*;
 import net.javaguides.springboot.service.UserService;
 import net.javaguides.springboot.web.dto.UserRegistrationDto;
 import org.springframework.web.context.request.WebRequest;
+
+import java.sql.Date;
+import java.time.Instant;
 
 @Controller
 @RequestMapping("/registration")
@@ -30,10 +35,19 @@ public class UserRegistrationController {
 	ApplicationEventPublisher eventPublisher;
 
 	private UserService userService;
+	private VerificationTokenRepository tokenRepository;
+
 	
 	public UserRegistrationController(UserService userService) {
 		super();
 		this.userService = userService;
+	}
+
+	@Scheduled(cron = "${purge.cron.expression}")
+	public void purgeExpiredTokens()
+	{
+		Date now = (Date) Date.from(Instant.now());
+		tokenRepository.deleteAllExpiredSince(now);
 	}
 
 	@ModelAttribute("user")
@@ -52,14 +66,8 @@ public class UserRegistrationController {
 	public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto)
 	{
 		try {
-			TemporaryUser temporaryUser = userService.getTemporaryUserByMail(registrationDto.getEmail());
-			if(temporaryUser.getEmail().equals(registrationDto.getEmail()))
-			{
-				//TODO: Remove token by user_id
-				userService.removeAllTokens();
-				userService.removeByMail(temporaryUser.getEmail());
-				userService.save(registrationDto);
-			}
+			userService.save(registrationDto);
+
 		}
 		catch(UserAlreadyExistAuthenticationException e) {
 			return "redirect:/registration?exist";

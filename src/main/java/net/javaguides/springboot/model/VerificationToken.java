@@ -20,7 +20,6 @@ public class VerificationToken {
     @JoinColumn(nullable = false, name = "user_id")
     private TemporaryUser temporaryUser;
 
-
     private Date expiryDate;
 
     public VerificationToken() {

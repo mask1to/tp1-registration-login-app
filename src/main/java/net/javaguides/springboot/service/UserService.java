@@ -19,5 +19,4 @@ public interface UserService extends UserDetailsService {
 	void createVerificationToken(TemporaryUser temporaryUser, String token);
 	void saveRegisteredUser(TemporaryUser temporaryUser);
 	void removeByMail(String mail);
-	void removeAllTokens();
 }
