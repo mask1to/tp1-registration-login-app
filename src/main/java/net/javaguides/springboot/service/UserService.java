@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.web.dto.UserRegistrationDto;
 
+import java.util.Optional;
+
 public interface UserService extends UserDetailsService {
 
 	User save(UserRegistrationDto registrationDto);
@@ -15,7 +17,7 @@ public interface UserService extends UserDetailsService {
 	TemporaryUser getTemporaryUser(String verificationToken);
 	TemporaryUser getTemporaryUserByMail(String mail);
 
-	VerificationToken getVerificationToken(String VerificationToken);
+	VerificationToken getVerificationToken(Optional<String> VerificationToken);
 	void createVerificationToken(TemporaryUser temporaryUser, String token);
 	void saveRegisteredUser(TemporaryUser temporaryUser);
 	void removeByMail(String mail);

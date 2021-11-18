@@ -16,6 +16,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/registrationConfirm")
@@ -30,29 +31,23 @@ public class RegistrationConfirmController {
 
     @GetMapping
     public String confirmRegistration
-            (WebRequest request, Model model, @RequestParam("token") String token) {
+            (WebRequest request, Model model, @RequestParam("token") Optional <String> token) {
 
         Locale locale = request.getLocale();
 
         VerificationToken verificationToken = service.getVerificationToken(token);
         if (verificationToken == null) {
-            //String message = messages.getMessage("auth.message.invalidToken", null, locale);
-            //model.addAttribute("message", message);
-            System.out.println("Bad user1");
-            //return "redirect:/badUser.html";
+            return "/badToken";
         }
 
         TemporaryUser temporaryUser = verificationToken.getTemporaryUser();
         Calendar cal = Calendar.getInstance();
         if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
-            //String messageValue = messages.getMessage("auth.message.expired", null, locale);
-            //model.addAttribute("message", messageValue);
-            System.out.println("Bad user2");
-            //return "redirect:/badUser.html";
+            return "/badToken";
         }
 
         temporaryUser.setEnabled(true);
         service.saveRegisteredUser(temporaryUser);
-        return "/login";
+        return "redirect:/registration";
     }
 }

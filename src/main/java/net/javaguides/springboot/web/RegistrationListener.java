@@ -30,6 +30,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
     public void onApplicationEvent(OnRegistrationCompleteEvent event) {
         this.confirmRegistration(event);
     }
+
     private void confirmRegistration(OnRegistrationCompleteEvent event) {
         TemporaryUser temporaryUser = event.getTemporaryUser();
         String token = UUID.randomUUID().toString();
@@ -40,7 +41,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
         /*String confirmationUrl
                 = event.getAppUrl() + "/registrationConfirm?token=" + token;*/
         String confirmationUrl
-                = event.getAppUrl() + "/registration?token=" + token;
+                = event.getAppUrl() + "/registrationConfirm?token=" + token;
         //String message = messages.getMessage("message.regSucc", null, event.getLocale());
 
         SimpleMailMessage email = new SimpleMailMessage();

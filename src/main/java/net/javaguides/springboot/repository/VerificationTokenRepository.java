@@ -6,11 +6,12 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
+import java.util.Optional;
 
 public interface VerificationTokenRepository
         extends JpaRepository<VerificationToken, Long> {
 
-    VerificationToken findByToken(String token);
+    VerificationToken findByToken(Optional<String> token);
 
     @Modifying
     @Query("delete from VerificationToken t where t.expiryDate <= ?1")

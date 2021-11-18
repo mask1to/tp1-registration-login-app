@@ -16,4 +16,10 @@ public class MainController {
 	{
 		return "index";
 	}
+
+	@GetMapping("/badToken")
+	public String badToken()
+	{
+		return "badToken";
+	}
 }

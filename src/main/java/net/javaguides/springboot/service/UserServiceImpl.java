@@ -3,6 +3,7 @@ import java.sql.Date;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import net.javaguides.springboot.model.TemporaryUser;
@@ -62,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public TemporaryUser getTemporaryUser(String verificationToken) {
-		TemporaryUser temporaryUser = tokenRepository.findByToken(verificationToken).getTemporaryUser();
+		TemporaryUser temporaryUser = tokenRepository.findByToken(Optional.ofNullable(verificationToken)).getTemporaryUser();
 		return temporaryUser;
 	}
 
@@ -81,7 +82,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public VerificationToken getVerificationToken(String VerificationToken) {
+	public VerificationToken getVerificationToken(Optional<String> VerificationToken) {
 		return tokenRepository.findByToken(VerificationToken);
 	}
 
