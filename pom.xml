@@ -11,7 +11,7 @@
 	<groupId>net.javaguides</groupId>
 	<artifactId>registration-login-spring-boot-security-thymeleaf-mysql</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>registration-login-spring-boot-security-thymeleaf-mysql</name>
+	<name>tp-project</name>
 	<description>Demo project for Spring Boot Thymeleaf and Hibernate</description>
 
 	<properties>
@@ -76,13 +76,28 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.session</groupId>
+			<artifactId>spring-session-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.session</groupId>
+			<artifactId>spring-session-jdbc</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<archive>
+						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
