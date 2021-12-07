@@ -36,7 +36,8 @@ public class User
 //	@Column(unique = true)
 	private String email;
 	private String secret_code= Base32.random();
-	//private boolean isUsing2fa;
+	@Column(name = "usingfa")
+	private boolean Usingfa;
 	private String password;
 
 	@Column(name = "enabled")
@@ -51,13 +52,15 @@ public class User
 	
 	public User() {}
 	
-	public User(String firstName, String lastName, String email, String password, Collection<Role> roles) {
+	public User(String firstName, String lastName, String email, String password,String secret_code,boolean Usingfa, Collection<Role> roles) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
 		this.password = password;
 		this.roles = roles;
+		this.secret_code=secret_code;
+		this.Usingfa=Usingfa;
 		this.enabled = true;
 	}
 
@@ -120,13 +123,13 @@ public class User
 		this.secret_code = secret_code;
 	}
 
-	//public boolean getUsing2fa() {
-	//	return isUsing2fa;
-	//}
+	public boolean getUsingfa() {
+		return Usingfa;
+	}
 
-	//public void setUsing2fa(boolean using2fa) {
-	//	isUsing2fa = using2fa;
-	//}
+	public void setUsingfa(boolean isusingfa) {
+		this.Usingfa = isusingfa;
+	}
 
 	public Collection<Role> getRoles() {
 		return roles;

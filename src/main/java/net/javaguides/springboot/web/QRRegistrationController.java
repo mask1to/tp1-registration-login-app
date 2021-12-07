@@ -44,8 +44,7 @@ public class QRRegistrationController {
         return "registrationQR";
     }
     @PostMapping
-    public String registerUserAccount() throws UnsupportedEncodingException {
-
+    public String registerUserAccount(){
         return "redirect:/login";
     }
 }

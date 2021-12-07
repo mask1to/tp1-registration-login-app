@@ -77,14 +77,12 @@ public class UserRegistrationController {
 		catch(UserAlreadyExistAuthenticationException e) {
 			return "redirect:/registration?exist";
 		}
-		//if (registrationDto.isUsing2fa()){
-
-		String QR=userService.generateQRUrl(registrationDto);
-		rm.addFlashAttribute("qr",QR);
-
-		return "redirect:/registrationQR";
-		//}
-		//else
-		//	return "redirect:/registration?success";
+		if (registrationDto.getUsingfa()){
+			String QR=userService.generateQRUrl(registrationDto);
+			rm.addFlashAttribute("qr",QR);
+			return "redirect:/registrationQR";
+		}
+		else
+			return "redirect:/registration?success";
 	}
 }

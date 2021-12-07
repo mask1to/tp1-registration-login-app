@@ -8,18 +8,17 @@ public class UserRegistrationDto {
 	private String lastName;
 	private String email;
 	private String password;
-	//private boolean isUsing2fa;
+	private boolean Usingfa;
 	private String secret_code= Base32.random();;
 	public UserRegistrationDto(){}
-	
-	
-	public UserRegistrationDto(String firstName, String lastName, String email, String password, String secret_code) {
+
+	public UserRegistrationDto(String firstName, String lastName, String email, String password, String secret_code,boolean Usingfa) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
 		this.password = password;
-		//this.isUsing2fa = isUsing2fa;
+		this.Usingfa = Usingfa;
 		this.secret_code = secret_code;
 	}
 	
@@ -48,13 +47,13 @@ public class UserRegistrationDto {
 		this.password = password;
 	}
 
-	//public boolean isUsing2fa() {
-	//	return isUsing2fa;
-	//}
+	public boolean getUsingfa() {
+		return Usingfa;
+	}
 
-	//public void setUsing2fa(boolean isUsing2fa) {
-	//	this.isUsing2fa = isUsing2fa;
-	//}
+	public void setUsingfa(boolean Usingfa) {
+		this.Usingfa = Usingfa;
+	}
 
 	public String getSecret_code() {
 		return secret_code;
