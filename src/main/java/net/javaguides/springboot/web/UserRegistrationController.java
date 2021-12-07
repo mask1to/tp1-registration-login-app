@@ -24,8 +24,12 @@ import net.javaguides.springboot.service.UserService;
 import net.javaguides.springboot.web.dto.UserRegistrationDto;
 import org.springframework.web.context.request.WebRequest;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Date;
+import java.text.AttributedString;
 import java.time.Instant;
+
+import org.thymeleaf.expression.Strings;
 
 @Controller
 @RequestMapping("/registration")
@@ -37,7 +41,7 @@ public class UserRegistrationController {
 	private UserService userService;
 	private VerificationTokenRepository tokenRepository;
 
-	
+
 	public UserRegistrationController(UserService userService) {
 		super();
 		this.userService = userService;
@@ -63,15 +67,21 @@ public class UserRegistrationController {
 	}
 	
 	@PostMapping
-	public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto)
-	{
+	public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto,Model model) throws UnsupportedEncodingException {
 		try {
 			userService.save(registrationDto);
-
 		}
 		catch(UserAlreadyExistAuthenticationException e) {
 			return "redirect:/registration?exist";
 		}
-		return "redirect:/registration?success";
+		//if (registrationDto.isUsing2fa()){
+
+		String QR=userService.generateQRUrl(registrationDto);
+		model.addAttribute("qr",QR);
+
+		return "redirect:/registrationQR";
+		//}
+		//else
+		//	return "redirect:/registration?success";
 	}
 }

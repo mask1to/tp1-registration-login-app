@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.web.dto.UserRegistrationDto;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 public interface UserService extends UserDetailsService {
@@ -21,4 +22,5 @@ public interface UserService extends UserDetailsService {
 	void createVerificationToken(TemporaryUser temporaryUser, String token);
 	void saveRegisteredUser(TemporaryUser temporaryUser);
 	void removeByMail(String mail);
+	String generateQRUrl(UserRegistrationDto user) throws UnsupportedEncodingException;
 }

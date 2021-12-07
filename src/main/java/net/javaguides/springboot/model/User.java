@@ -1,5 +1,7 @@
 package net.javaguides.springboot.model;
 
+import org.jboss.aerogear.security.otp.api.Base32;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -33,7 +35,8 @@ public class User
 	
 //	@Column(unique = true)
 	private String email;
-	
+	private String secret_code= Base32.random();
+	//private boolean isUsing2fa;
 	private String password;
 
 	@Column(name = "enabled")
@@ -64,6 +67,11 @@ public class User
 		this.roles = roles;
 	}
 
+	public User(String email, String secret_code){
+		super();
+		this.email=email;
+		this.secret_code=secret_code;
+	}
     public Long getId() {
 		return id;
 	}
@@ -104,6 +112,22 @@ public class User
 		this.password = password;
 	}
 
+	public String getSecret_code() {
+		return secret_code;
+	}
+
+	public void setSecret_code(String secret_code) {
+		this.secret_code = secret_code;
+	}
+
+	//public boolean getUsing2fa() {
+	//	return isUsing2fa;
+	//}
+
+	//public void setUsing2fa(boolean using2fa) {
+	//	isUsing2fa = using2fa;
+	//}
+
 	public Collection<Role> getRoles() {
 		return roles;
 	}
@@ -115,7 +139,7 @@ public class User
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
-				+ ", password=" + password + ", roles=" + roles + "]";
+				+ ", password=" + password + ", secret_code=" + secret_code + ", roles=" + roles + "]";
 	}
 
 	public boolean isEnabled() {

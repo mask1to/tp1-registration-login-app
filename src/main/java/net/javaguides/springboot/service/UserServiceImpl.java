@@ -1,4 +1,6 @@
 package net.javaguides.springboot.service;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.Arrays;
@@ -112,6 +114,14 @@ public class UserServiceImpl implements UserService {
 	private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles)
 	{
 		return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+	}
+	public static String QR_PREFIX =
+			"https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
+	public static String APP_NAME = "SpringRegistration";
+	@Override
+	public String generateQRUrl(UserRegistrationDto user) throws UnsupportedEncodingException {
+		return QR_PREFIX + URLEncoder.encode(String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", APP_NAME, user.getEmail(),
+				user.getSecret_code(), APP_NAME), "UTF-8");
 	}
 
 }
