@@ -29,7 +29,10 @@ import java.sql.Date;
 import java.text.AttributedString;
 import java.time.Instant;
 
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.thymeleaf.expression.Strings;
+
+import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/registration")
@@ -67,7 +70,7 @@ public class UserRegistrationController {
 	}
 	
 	@PostMapping
-	public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto,Model model) throws UnsupportedEncodingException {
+	public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto, RedirectAttributes rm) throws UnsupportedEncodingException {
 		try {
 			userService.save(registrationDto);
 		}
@@ -77,7 +80,7 @@ public class UserRegistrationController {
 		//if (registrationDto.isUsing2fa()){
 
 		String QR=userService.generateQRUrl(registrationDto);
-		model.addAttribute("qr",QR);
+		rm.addFlashAttribute("qr",QR);
 
 		return "redirect:/registrationQR";
 		//}

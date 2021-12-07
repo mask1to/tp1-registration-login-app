@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <title>QR code</title>
@@ -15,7 +15,8 @@
     <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605">iPhone</a>
   </p>
   <br/>
-  <img th:src="${param.qr[0]}"/>
+
+  <img th:src="${qr}">
 </div>
 
 
