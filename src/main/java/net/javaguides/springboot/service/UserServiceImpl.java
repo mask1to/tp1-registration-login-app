@@ -1,4 +1,5 @@
 package net.javaguides.springboot.service;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.Date;
@@ -13,8 +14,11 @@ import net.javaguides.springboot.model.VerificationToken;
 import net.javaguides.springboot.repository.TemporaryUserRepository;
 import net.javaguides.springboot.repository.VerificationTokenRepository;
 import net.javaguides.springboot.web.dto.UserEmailDto;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.acls.model.AlreadyExistsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,104 +30,107 @@ import net.javaguides.springboot.model.Role;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.repository.UserRepository;
 import net.javaguides.springboot.web.dto.UserRegistrationDto;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-	private UserRepository userRepository;
-	private TemporaryUserRepository temporaryUserRepository;
+    private UserRepository userRepository;
+    private TemporaryUserRepository temporaryUserRepository;
 
-	@Autowired
-	private VerificationTokenRepository tokenRepository;
-	
-	@Autowired
-	private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private VerificationTokenRepository tokenRepository;
 
-	public UserServiceImpl(UserRepository userRepository, TemporaryUserRepository temporaryUserRepository) {
-		super();
-		this.userRepository = userRepository;
-		this.temporaryUserRepository = temporaryUserRepository;
-	}
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
-	@Override
-	public User save(UserRegistrationDto registrationDto) {
-		User user=new User(registrationDto.getFirstName(),
-							registrationDto.getLastName(), 
-							registrationDto.getEmail(),
-							passwordEncoder.encode(registrationDto.getPassword()),
-							registrationDto.getSecret_code(),
-							registrationDto.getUsingfa(),
-							Arrays.asList(new Role("USER")));
-		
-		return userRepository.save(user);
-	}
+    public UserServiceImpl(UserRepository userRepository, TemporaryUserRepository temporaryUserRepository) {
+        super();
+        this.userRepository = userRepository;
+        this.temporaryUserRepository = temporaryUserRepository;
+    }
 
-	@Override
-	public TemporaryUser saveEmail(UserEmailDto userEmailDto) {
-		TemporaryUser temporaryUser = new TemporaryUser(userEmailDto.getEmail(), Arrays.asList(new Role("TEMP_USER")));
+    @Override
+    public User save(UserRegistrationDto registrationDto) {
+        User user = new User(registrationDto.getFirstName(),
+                registrationDto.getLastName(),
+                registrationDto.getEmail(),
+                passwordEncoder.encode(registrationDto.getPassword()),
+                registrationDto.getSecret_code(),
+                registrationDto.getUsingfa(),
+                Arrays.asList(new Role("USER")));
 
-		return temporaryUserRepository.save(temporaryUser);
-	}
+        return userRepository.save(user);
+    }
 
-	@Override
-	public TemporaryUser getTemporaryUser(String verificationToken) {
-		TemporaryUser temporaryUser = tokenRepository.findByToken(Optional.ofNullable(verificationToken)).getTemporaryUser();
-		return temporaryUser;
-	}
+    @Override
+    public TemporaryUser saveEmail(UserEmailDto userEmailDto, RedirectAttributes redirectAttributes) {
+        try {
+            TemporaryUser temporaryUser = new TemporaryUser(userEmailDto.getEmail(), Arrays.asList(new Role("TEMP_USER")));
+            return temporaryUserRepository.save(temporaryUser);
+        } catch (DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("error", "User already exists");
+            return null;
+        }
 
-	@Override
-	public TemporaryUser getTemporaryUserByMail(String mail)
-	{
-		TemporaryUser temporaryUser = temporaryUserRepository.findByEmail(mail);
-		return temporaryUser;
-	}
+    }
 
-	@Override
-	public void removeByMail(String mail)
-	{
-		TemporaryUser temporaryUser = temporaryUserRepository.findByEmail(mail);
-		temporaryUserRepository.delete(temporaryUser);
-	}
+    @Override
+    public TemporaryUser getTemporaryUser(String verificationToken) {
+        TemporaryUser temporaryUser = tokenRepository.findByToken(Optional.ofNullable(verificationToken)).getTemporaryUser();
+        return temporaryUser;
+    }
 
-	@Override
-	public VerificationToken getVerificationToken(Optional<String> VerificationToken) {
-		return tokenRepository.findByToken(VerificationToken);
-	}
+    @Override
+    public TemporaryUser getTemporaryUserByMail(String mail) {
+        TemporaryUser temporaryUser = temporaryUserRepository.findByEmail(mail);
+        return temporaryUser;
+    }
 
-	@Override
-	public void createVerificationToken(TemporaryUser temporaryUser, String token) {
-		VerificationToken myToken = new VerificationToken(token, temporaryUser);
-		tokenRepository.save(myToken);
-	}
+    @Override
+    public void removeByMail(String mail) {
+        TemporaryUser temporaryUser = temporaryUserRepository.findByEmail(mail);
+        temporaryUserRepository.delete(temporaryUser);
+    }
 
-	@Override
-	public void saveRegisteredUser(TemporaryUser temporaryUser) {
-		temporaryUserRepository.save(temporaryUser);
-	}
+    @Override
+    public VerificationToken getVerificationToken(Optional<String> VerificationToken) {
+        return tokenRepository.findByToken(VerificationToken);
+    }
 
-	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException 
-	{
-		User user=userRepository.findByEmail(username); 
-		
-		if(user==null)
-		{
-			throw new UsernameNotFoundException("Invalid Email or password");
-		}
-		return new org.springframework.security.core.userdetails.User(user.getEmail(),user.getPassword(),mapRolesToAuthorities(user.getRoles()));
-	}
+    @Override
+    public void createVerificationToken(TemporaryUser temporaryUser, String token) {
+        VerificationToken myToken = new VerificationToken(token, temporaryUser);
+        tokenRepository.save(myToken);
+    }
 
-	private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles)
-	{
-		return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
-	}
-	public static String QR_PREFIX =
-			"https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
-	public static String APP_NAME = "SpringRegistration";
-	@Override
-	public String generateQRUrl(UserRegistrationDto user) throws UnsupportedEncodingException {
-		return QR_PREFIX + URLEncoder.encode(String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", APP_NAME, user.getEmail(),
-				user.getSecret_code(), APP_NAME), "UTF-8");
-	}
+    @Override
+    public void saveRegisteredUser(TemporaryUser temporaryUser) {
+        temporaryUserRepository.save(temporaryUser);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(username);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("Invalid Email or password");
+        }
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), mapRolesToAuthorities(user.getRoles()));
+    }
+
+    private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
+        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+    }
+
+    public static String QR_PREFIX =
+            "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
+    public static String APP_NAME = "SpringRegistration";
+
+    @Override
+    public String generateQRUrl(UserRegistrationDto user) throws UnsupportedEncodingException {
+        return QR_PREFIX + URLEncoder.encode(String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", APP_NAME, user.getEmail(),
+                user.getSecret_code(), APP_NAME), "UTF-8");
+    }
 
 }

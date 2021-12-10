@@ -10,12 +10,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import net.javaguides.springboot.service.UserService;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -56,43 +59,34 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(
                         "/welcome**",
                         "/registration**",
-                        "/registrationConfirm**",
                         "/registrationQR**",
                         "/js/**",
                         "/css/**",
-                        "/img/**").permitAll()
+                        "/img/**",
+                        "/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
                 .loginPage("/login")
                 .permitAll()
-                .successHandler(new AuthenticationSuccessHandler() {
-                    @Override
-                    public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
-                        @SuppressWarnings("unchecked")
-                        List<String> msgs = (List<String>) httpServletRequest.getSession().getAttribute("MY_SESSION_MESSAGES");
-                        if (msgs == null) {
-                            httpServletRequest.getSession().setAttribute("principal_name", authentication.getName());
-                        }
-                        httpServletRequest.getSession().setAttribute("principal_name", authentication.getName());
+                .successHandler((httpServletRequest, httpServletResponse, authentication) -> {
 
-
-                        httpServletResponse.sendRedirect("/");
-                    }
+                    httpServletRequest.getSession().setAttribute("principal_name", authentication.getName());
+                    httpServletRequest.getSession().setMaxInactiveInterval(300);
+                    httpServletResponse.sendRedirect("/");
                 })
                 .and()
                 .logout()
                 .clearAuthentication(true)
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .permitAll()
-                .logoutSuccessHandler(new LogoutSuccessHandler() {
-                    @Override
-                    public void onLogoutSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
-                        httpServletRequest.getSession().invalidate();
-                        httpServletResponse.sendRedirect("/login?logout");
-                    }
+                .logoutSuccessHandler((httpServletRequest, httpServletResponse, authentication) -> {
+                    httpServletRequest.getSession().invalidate();
+                    httpServletResponse.sendRedirect("/login?logout");
                 }).and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED).maximumSessions(1);
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .maximumSessions(1)
+                .expiredUrl("/login?error");
     }
 }

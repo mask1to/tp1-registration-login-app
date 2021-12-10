@@ -3,10 +3,12 @@ package net.javaguides.springboot.service;
 import net.javaguides.springboot.model.TemporaryUser;
 import net.javaguides.springboot.model.VerificationToken;
 import net.javaguides.springboot.web.dto.UserEmailDto;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.web.dto.UserRegistrationDto;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
@@ -14,7 +16,7 @@ import java.util.Optional;
 public interface UserService extends UserDetailsService {
 
 	User save(UserRegistrationDto registrationDto);
-	TemporaryUser saveEmail(UserEmailDto userEmailDto);
+	TemporaryUser saveEmail(UserEmailDto userEmailDto, RedirectAttributes redirectAttributes) throws ConstraintViolationException;
 	TemporaryUser getTemporaryUser(String verificationToken);
 	TemporaryUser getTemporaryUserByMail(String mail);
 
