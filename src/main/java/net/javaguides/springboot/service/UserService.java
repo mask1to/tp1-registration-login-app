@@ -25,4 +25,6 @@ public interface UserService extends UserDetailsService {
 	void saveRegisteredUser(TemporaryUser temporaryUser);
 	void removeByMail(String mail);
 	String generateQRUrl(UserRegistrationDto user) throws UnsupportedEncodingException;
+	User findByEmail(String email);
+	boolean checkcode(User user,String Scode);
 }
