@@ -1,4 +1,4 @@
-<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-light bg-light">
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-light bg-light py-3">
     <a class="navbar-brand" th:href="@{/}">TP</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -6,7 +6,7 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
+        <ul class="navbar-nav w-100">
             <li th:classappend="${#httpServletRequest.getRequestURI() == '/' ? 'active':''}" class="nav-item">
                 <a class="nav-link" th:href="@{/}">Home <span class="sr-only">(current)</span></a>
             </li>
@@ -16,8 +16,11 @@
             <li th:classappend="${#httpServletRequest.getRequestURI() == '/welcome' || #httpServletRequest.getRequestURI() == '/registration' ? 'active':''}" class="nav-item" sec:authorize="!isAuthenticated()">
                 <a class="nav-link" th:href="@{/welcome}">Registration</a>
             </li>
+            <li th:classappend="${#httpServletRequest.getRequestURI() == '/about-team' || #httpServletRequest.getRequestURI() == '/registration' ? 'active':''}" class="nav-item">
+                <a class="nav-link" th:href="@{/about-team}">About team</a>
+            </li>
             <li class="nav-item ml-auto" sec:authorize="isAuthenticated()">
-                <a class="nav-link" th:href="@{/logout}">Logout</a>
+                <a class="btn btn-danger" th:href="@{/logout}">Logout</a>
             </li>
         </ul>
     </div>

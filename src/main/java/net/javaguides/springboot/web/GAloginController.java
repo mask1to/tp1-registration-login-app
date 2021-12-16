@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -48,11 +49,14 @@ public class GAloginController {
         return "GAlogin";
     }
     @PostMapping
-    public String loginUser(@ModelAttribute("user") SecretCode secretCode, HttpSession session){
+    public String loginUser(@ModelAttribute("user") SecretCode secretCode, HttpSession session, RedirectAttributes redirectAttributes){
         User user = userService.findByEmail(session.getAttribute("principal_name").toString());
         if (userService.checkcode(user,secretCode.getSecret_code()))
             return "redirect:/";
-        else
-            return "redirect:/GAlogin?bad";
+        else {
+            redirectAttributes.addFlashAttribute("error", "Wrong code");
+            return "redirect:/GAlogin";
+        }
+
     }
 }

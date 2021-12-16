@@ -12,28 +12,32 @@ import java.util.List;
 @Controller
 public class MainController {
 
-	@GetMapping("/login")
-	public String login(HttpSession session) {
-		if(session.getAttribute("principal_name") != null) {
-			return "redirect:/";
-		}
+    @GetMapping("/login")
+    public String login(HttpSession session) {
+        if (session.getAttribute("principal_name") != null) {
+            return "redirect:/";
+        }
 
-		return "login";
-	}
+        return "login";
+    }
 
-	@GetMapping("/")
-	public String home(Model model, HttpSession session) {
+    @GetMapping("/")
+    public String home(Model model, HttpSession session) {
 
-		Date d = new Date(session.getCreationTime());
+        Date d = new Date(session.getCreationTime());
 
-		model.addAttribute("sessionEx", d);
+        model.addAttribute("sessionEx", d);
 
-		return "index";
-	}
+        return "index";
+    }
 
-	@GetMapping("/badToken")
-	public String badToken()
-	{
-		return "badToken";
-	}
+    @GetMapping("/badToken")
+    public String badToken() {
+        return "badToken";
+    }
+
+    @GetMapping("/about-team")
+    public String aboutTeam() {
+        return "about-team";
+    }
 }

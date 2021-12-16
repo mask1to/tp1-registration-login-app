@@ -7,24 +7,26 @@
 
 <div th:replace="includes/navbar :: navbar"/>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 col-md-offset-3">
-            <div id="qr">
-                <p>Scan this Barcode using Google Authenticator app on your phone to use it later in login
-                    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2">Android</a>
-                    and
-                    <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605">iPhone</a>
-                </p>
-                <br/>
+<section class="pt-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <div id="qr">
+                    <p>Scan this Barcode using Google Authenticator app on your phone to use it later in login
+                        <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2">Android</a>
+                        and
+                        <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605">iPhone</a>
+                    </p>
+                    <br/>
 
-                <img th:src="${qr}">
+                    <img th:src="${qr}">
+                </div>
+                <a href="/login" class="btn btn-primary">Finish registration</a>
+
             </div>
-            <a href="/login" class="btn btn-primary">Finish registration</a>
-
         </div>
     </div>
-</div>
+</section>
 
 
 </body>
