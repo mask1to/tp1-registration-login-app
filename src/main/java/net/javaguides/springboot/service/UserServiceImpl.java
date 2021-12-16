@@ -15,6 +15,7 @@ import net.javaguides.springboot.repository.TemporaryUserRepository;
 import net.javaguides.springboot.repository.VerificationTokenRepository;
 import net.javaguides.springboot.web.dto.UserEmailDto;
 import org.hibernate.exception.ConstraintViolationException;
+import org.jboss.aerogear.security.otp.Totp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -125,12 +126,30 @@ public class UserServiceImpl implements UserService {
 
     public static String QR_PREFIX =
             "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
-    public static String APP_NAME = "SpringRegistration";
+    public static String APP_NAME = "TP";
 
     @Override
     public String generateQRUrl(UserRegistrationDto user) throws UnsupportedEncodingException {
         return QR_PREFIX + URLEncoder.encode(String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", APP_NAME, user.getEmail(),
                 user.getSecret_code(), APP_NAME), "UTF-8");
     }
+    @Override
+    public User findByEmail(String email) {
+    	User user = userRepository.findByEmail(email);
+    	return user;
+    }
 
+    @Override
+    public boolean checkcode(User user,String Scode) {
+        Totp totp = new Totp(user.getSecret_code());
+        try {
+            Long.parseLong(Scode);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        if (totp.verify(Scode))
+            return true;
+        else
+            return false;
+    }
 }

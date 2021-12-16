@@ -1,5 +1,6 @@
 package net.javaguides.springboot.config;
 
+import net.javaguides.springboot.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,6 +61,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/welcome**",
                         "/registration**",
                         "/registrationQR**",
+                        "/GAlogin**",
                         "/js/**",
                         "/css/**",
                         "/img/**",
@@ -73,7 +75,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                     httpServletRequest.getSession().setAttribute("principal_name", authentication.getName());
                     httpServletRequest.getSession().setMaxInactiveInterval(300);
-                    httpServletResponse.sendRedirect("/");
+                    User user = userService.findByEmail(authentication.getName());
+                    if (user.getUsingfa()) {
+                        httpServletResponse.sendRedirect("/GAlogin");
+                    }
+                    else
+                        httpServletResponse.sendRedirect("/");
                 })
                 .and()
                 .logout()
