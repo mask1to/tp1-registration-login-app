@@ -5,6 +5,7 @@ import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.model.VerificationToken;
 import net.javaguides.springboot.repository.TemporaryUserRepository;
 import net.javaguides.springboot.repository.VerificationTokenRepository;
+import net.javaguides.springboot.service.AddrService;
 import net.javaguides.springboot.web.exceptions.UserAlreadyExistAuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -97,6 +98,7 @@ public class UserRegistrationController {
             redirectAttributes.addFlashAttribute("error", "User already exists");
             return "redirect:/registration";
         }
+
         if (registrationDto.getUsingfa()) {
             String QR = userService.generateQRUrl(registrationDto);
             redirectAttributes.addFlashAttribute("qr", QR);

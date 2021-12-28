@@ -16,6 +16,7 @@
                 </div>
                 <div sec:authorize="!isAuthenticated()">
                     <h1>Please log in!</h1>
+                    <p th:text="${ipaddr}"></p>
                 </div>
             </div>
         </div>

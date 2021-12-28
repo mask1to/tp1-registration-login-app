@@ -1,6 +1,10 @@
 package net.javaguides.springboot.config;
 
+import com.maxmind.geoip2.exception.GeoIp2Exception;
+import net.javaguides.springboot.model.GeoIp;
 import net.javaguides.springboot.model.User;
+import net.javaguides.springboot.service.AddrService;
+import net.javaguides.springboot.web.GetLocationContoller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +29,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +39,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AddrService addrService;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -76,6 +84,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                     httpServletRequest.getSession().setAttribute("principal_name", authentication.getName());
                     httpServletRequest.getSession().setMaxInactiveInterval(300);
+                    GetLocationContoller locationContoller = new GetLocationContoller();
+                    try {
+                        GeoIp geoIp = locationContoller.getLocation(httpServletRequest.getRemoteAddr());
+                        System.out.println(geoIp.getCountry());
+                    } catch (GeoIp2Exception e) {
+                        e.printStackTrace();
+                    }
+
                     User user = userService.findByEmail(authentication.getName());
                     if (user.getUsingfa()) {
                         httpServletResponse.sendRedirect("/GAlogin");
