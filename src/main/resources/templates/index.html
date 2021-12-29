@@ -17,6 +17,9 @@
                 <div sec:authorize="!isAuthenticated()">
                     <h1>Please log in!</h1>
                     <p th:text="${ipaddr}"></p>
+                    <p th:text="${bname}"></p>
+                    <p th:text="${bversion}"></p>
+                    <p th:text="${os}"></p>
                 </div>
             </div>
         </div>

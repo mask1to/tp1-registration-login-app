@@ -1,5 +1,6 @@
 package net.javaguides.springboot.web;
 
+import eu.bitwalker.useragentutils.UserAgent;
 import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +31,12 @@ public class MainController {
 
         model.addAttribute("sessionEx", d);
         model.addAttribute("ipaddr", request.getRemoteAddr());
+        UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
+
+        model.addAttribute("bname", userAgent.getBrowser().getName());
+        model.addAttribute("bversion", userAgent.getBrowserVersion());
+        model.addAttribute("os", System.getProperty("os.name"));
+
 
         return "index";
     }
