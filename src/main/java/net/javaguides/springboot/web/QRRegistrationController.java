@@ -3,6 +3,7 @@ package net.javaguides.springboot.web;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.repository.VerificationTokenRepository;
 import net.javaguides.springboot.service.UserService;
+import net.javaguides.springboot.web.dto.SecretCode;
 import net.javaguides.springboot.web.dto.UserRegistrationDto;
 import net.javaguides.springboot.web.exceptions.UserAlreadyExistAuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import java.sql.Date;
 import java.time.Instant;
 import java.util.Objects;
 import net.javaguides.springboot.repository.UserRepository;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 @Controller
 @RequestMapping("/registrationQR")
 public class QRRegistrationController {
@@ -38,13 +41,27 @@ public class QRRegistrationController {
         Date now = (Date) Date.from(Instant.now());
         tokenRepository.deleteAllExpiredSince(now);
     }
+    @ModelAttribute("user")
+    public SecretCode SecretCode() {
+        return new SecretCode();
+    }
     @GetMapping
     public String showRegistrationForm()
     {
         return "registrationQR";
     }
     @PostMapping
-    public String registerUserAccount(){
-        return "redirect:/login";
+    public String registerUserAccount(@ModelAttribute("user") SecretCode secretCode, RedirectAttributes redirectAttributes) throws UnsupportedEncodingException {
+        String mail= secretCode.getEmail();
+        User user = userService.findByEmail(mail);
+        if (userService.checkcode(user,secretCode.getSecret_code()))
+            return "redirect:/login";
+        else {
+            String QR = userService.generateQRUrl(user);
+            redirectAttributes.addFlashAttribute("qr", QR);
+            redirectAttributes.addFlashAttribute("mail", secretCode.getEmail());
+            redirectAttributes.addFlashAttribute("error", "Wrong code");
+            return "redirect:/registrationQR";
+        }
     }
 }
