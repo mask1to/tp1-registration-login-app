@@ -1,9 +1,11 @@
 package net.javaguides.springboot.config;
 
 
+import net.javaguides.springboot.model.Transaction;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.service.UserService;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.json.HTTP;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
@@ -20,7 +22,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Date;
 
 @Configuration
 @EnableWebSecurity
@@ -97,7 +104,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     private void callRiskServer() {
-        String url = "https://serene-refuge-96326.herokuapp.com/oauth/token?scope=write&grant_type=password&username=foo&password=foo";
+        String url = "http://localhost:8080/oauth/token?scope=write&grant_type=password&username=foo&password=foo";  //"https://serene-refuge-96326.herokuapp.com/oauth/token?scope=write&grant_type=password&username=foo&password=foo";
         RestTemplate rt = new RestTemplate();
 
         String plainCreds = "clientId:abcd";
@@ -110,7 +117,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         HttpEntity<String> request = new HttpEntity<String>(headers);
         ResponseEntity<?> response = rt.exchange(url, HttpMethod.POST, request, JSONObject.class);
-//        JSONObject account = response.getBody();
         JSONObject jsontoken = (JSONObject) response.getBody();
         String token = (String) jsontoken.get("access_token");
         logger.info(token);
@@ -120,19 +126,34 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     private void evaluateRiskServer(String token) {
-        String url = "https://serene-refuge-96326.herokuapp.com/evaluate";
+
+        String url = "http://localhost:8080/evaluate";
         RestTemplate rt = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Authorization", "Bearer " + token);
-//        JSONObject body = new JSONObject();
-//        body.put("lastIP", "192.16");
-//        body.put("lastTransaction", "create");
-        //  workaround
-        String body = "{\"lastIP\":\"129\",\"lastTransaction\":\"login\"}";
-        HttpEntity<String> request = new HttpEntity<String>( body.toString() ,headers);
-        ResponseEntity<?> response = rt.exchange(url, HttpMethod.GET, request, String.class);
-        logger.info((String) response.getBody());
+        // do body sa budu pridavat parametre v dalsom riadku su dummy data
+        String body = "{ \"lastIP\":\"192.31\" , \"lastTransaction\":\"create\"}";
+        HttpEntity<String> request = new HttpEntity<>( body ,headers);
+        String risk_result = null;
+        try {
+            ResponseEntity<String> response = rt.exchange(url, HttpMethod.POST, request, String.class);
+            risk_result = response.getBody();
+        }catch (HttpStatusCodeException e){
+            String errorpayload = e.getResponseBodyAsString();
+            logger.info(String.valueOf(errorpayload));
+            // ako riesit nedostupnost risk servera???
+        }
+
+        // handling
+        if (risk_result.equals("high risk")){
+
+        }else if (risk_result.equals("medium risk")){
+
+        }else if(risk_result.equals("low risk")){
+
+        }
+
 
 
     }
