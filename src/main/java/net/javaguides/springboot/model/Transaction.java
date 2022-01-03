@@ -4,6 +4,18 @@ import java.util.Date;
 
 
 public class Transaction {
+
+    String lastTransaction;
+    Date date;
+    String lastIP;
+
+    public Transaction(String lastIP, String lastTransaction, Date date) {
+        this.lastIP = lastIP;
+        this.lastTransaction = lastTransaction;
+        this.date = date;
+    }
+
+
     public Date getDate() {
         return date;
     }
@@ -12,8 +24,6 @@ public class Transaction {
         this.date = date;
     }
 
-    Date date;
-    String lastIP;
 
     public String getLastIP() {
         return lastIP;
@@ -31,12 +41,7 @@ public class Transaction {
         this.lastTransaction = lastTransaction;
     }
 
-    public Transaction(String lastIP, String lastTransaction, Date date) {
-        this.lastIP = lastIP;
-        this.lastTransaction = lastTransaction;
-        this.date = date;
-    }
 
-    String lastTransaction;
+
 
 }

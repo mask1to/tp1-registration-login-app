@@ -77,12 +77,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .successHandler((httpServletRequest, httpServletResponse, authentication) -> {
                     // call na risk server
-                    callRiskServer();
+                    int riskValue = callRiskServer();
 
                     httpServletRequest.getSession().setAttribute("principal_name", authentication.getName());
                     httpServletRequest.getSession().setMaxInactiveInterval(300);
                     User user = userService.findByEmail(authentication.getName());
-                    if (user.getUsingfa()) {
+                    if (user.getUsingfa() ||  riskValue  >= 2 ) {
                         httpServletResponse.sendRedirect("/GAlogin");
                     }
                     else
@@ -103,8 +103,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .expiredUrl("/login?error");
     }
 
-    private void callRiskServer() {
-        String url = "http://localhost:8080/oauth/token?scope=write&grant_type=password&username=foo&password=foo";  //"https://serene-refuge-96326.herokuapp.com/oauth/token?scope=write&grant_type=password&username=foo&password=foo";
+    private int callRiskServer() {
+        String url = "https://serene-refuge-96326.herokuapp.com/oauth/token?scope=write&grant_type=password&username=foo&password=foo";
+//        String url = "http://localhost:8080/oauth/token?scope=write&grant_type=password&username=foo&password=foo";
         RestTemplate rt = new RestTemplate();
 
         String plainCreds = "clientId:abcd";
@@ -121,38 +122,46 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         String token = (String) jsontoken.get("access_token");
         logger.info(token);
 
-        evaluateRiskServer(token);
-
-    }
-
-    private void evaluateRiskServer(String token) {
-
-        String url = "http://localhost:8080/evaluate";
-        RestTemplate rt = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
+//        url = "http://localhost:8080/evaluate";
+         url = "https://serene-refuge-96326.herokuapp.com/evaluate";
+         rt = new RestTemplate();
+         headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
         headers.setContentType(MediaType.APPLICATION_JSON);
         // do body sa budu pridavat parametre v dalsom riadku su dummy data
-        String body = "{ \"lastIP\":\"192.31\" , \"lastTransaction\":\"create\"}";
-        HttpEntity<String> request = new HttpEntity<>( body ,headers);
+        String body = "{ " +
+                "\"lastIP\":\"192.31\" ," +
+                " \"lastTransaction\":\"pls funguj\"" +
+                "}";
+        HttpEntity<String> entity = new HttpEntity<>( body ,headers);
         String risk_result = null;
         try {
-            ResponseEntity<String> response = rt.exchange(url, HttpMethod.POST, request, String.class);
-            risk_result = response.getBody();
+            ResponseEntity<String> responseValue = rt.exchange(url, HttpMethod.POST, entity, String.class);
+            risk_result = responseValue.getBody();
+            logger.info(risk_result);
         }catch (HttpStatusCodeException e){
             String errorpayload = e.getResponseBodyAsString();
             logger.info(String.valueOf(errorpayload));
             // ako riesit nedostupnost risk servera???
         }
-
-        // handling
         if (risk_result.equals("high risk")){
-
+            return 3;
         }else if (risk_result.equals("medium risk")){
-
+            return 2;
         }else if(risk_result.equals("low risk")){
-
+            return 1;
         }
+
+        return 0;
+
+
+
+
+    }
+
+    private void evaluateRiskServer(String token) {
+
+
 
 
 
