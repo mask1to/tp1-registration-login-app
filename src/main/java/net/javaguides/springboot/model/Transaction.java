@@ -5,41 +5,55 @@ import java.util.Date;
 
 public class Transaction {
 
-    String lastTransaction;
-    Date date;
-    String lastIP;
+    Date datum;
+    String ipAdresa;
+    String pozadovanaTransakcia;
+    String krajina ;
 
-    public Transaction(String lastIP, String lastTransaction, Date date) {
-        this.lastIP = lastIP;
-        this.lastTransaction = lastTransaction;
-        this.date = date;
+
+    public Transaction(String ipAdresa, String pozadovanaTransakcia, Date datum, String krajina) {
+        this.ipAdresa = ipAdresa;
+        this.pozadovanaTransakcia = pozadovanaTransakcia;
+        this.datum = datum;
+        this.krajina = krajina;
+    }
+
+    public String getKrajina() {
+        return krajina;
+    }
+
+    public void setKrajina(String krajina) {
+        this.krajina = krajina;
+    }
+
+    public Date getDatum() {
+        return datum;
+    }
+
+    public void setDatum(Date datum) {
+        this.datum = datum;
+    }
+
+    public String getIpAdresa() {
+        return ipAdresa;
+    }
+
+    public void setIpAdresa(String ipAdresa) {
+        this.ipAdresa = ipAdresa;
+    }
+
+    public String getPozadovanaTransakcia() {
+        return pozadovanaTransakcia;
+    }
+
+    public void setPozadovanaTransakcia(String pozadovanaTransakcia) {
+        this.pozadovanaTransakcia = pozadovanaTransakcia;
     }
 
 
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
 
 
-    public String getLastIP() {
-        return lastIP;
-    }
 
-    public void setLastIP(String lastIP) {
-        this.lastIP = lastIP;
-    }
-
-    public String getLastTransaction() {
-        return lastTransaction;
-    }
-
-    public void setLastTransaction(String lastTransaction) {
-        this.lastTransaction = lastTransaction;
-    }
 
 
 

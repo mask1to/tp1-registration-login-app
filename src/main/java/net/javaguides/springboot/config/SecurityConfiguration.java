@@ -128,12 +128,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
          headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
         headers.setContentType(MediaType.APPLICATION_JSON);
-        // do body sa budu pridavat parametre v dalsom riadku su dummy data
-        String body = "{ " +
-                "\"lastIP\":\"192.31\" ," +
-                " \"lastTransaction\":\"pls funguj\"" +
-                "}";
-        HttpEntity<String> entity = new HttpEntity<>( body ,headers);
+        Transaction body = new Transaction("123.12", "doneAsi", new Date(), "Pučdansko");
+        HttpEntity<Transaction> entity = new HttpEntity<Transaction>( body ,headers);
         String risk_result = null;
         try {
             ResponseEntity<String> responseValue = rt.exchange(url, HttpMethod.POST, entity, String.class);
