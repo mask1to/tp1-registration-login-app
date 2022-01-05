@@ -35,7 +35,27 @@ public class MainController {
 
         model.addAttribute("bname", userAgent.getBrowser().getName());
         model.addAttribute("bversion", userAgent.getBrowserVersion());
-        model.addAttribute("os", System.getProperty("os.name"));
+
+        String browserDetails = request.getHeader("User-Agent");
+        String userAgent1 = browserDetails;
+        String os = "";
+
+        if (userAgent1.toLowerCase().indexOf("windows") >= 0) {
+            os = "Windows";
+        } else if (userAgent1.toLowerCase().indexOf("mac") >= 0) {
+            os = "Mac";
+        } else if (userAgent1.toLowerCase().indexOf("x11") >= 0) {
+            os = "Unix";
+        } else if (userAgent1.toLowerCase().indexOf("android") >= 0) {
+            os = "Android";
+        } else if (userAgent1.toLowerCase().indexOf("iphone") >= 0) {
+            os = "IPhone";
+        } else {
+            os = "UnKnown, More-Info: " + userAgent;
+        }
+
+
+        model.addAttribute("os", os);
 
 
         return "index";
