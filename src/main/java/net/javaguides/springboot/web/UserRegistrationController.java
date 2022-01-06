@@ -102,6 +102,7 @@ public class UserRegistrationController {
         if (registrationDto.getUsingfa()) {
             String QR = userService.generateQRUrl(registrationDto);
             redirectAttributes.addFlashAttribute("qr", QR);
+            redirectAttributes.addFlashAttribute("mail", registrationDto.getEmail());
             return "redirect:/registrationQR";
         } else {
             redirectAttributes.addFlashAttribute("success", "Registration was successful. You can log in!");

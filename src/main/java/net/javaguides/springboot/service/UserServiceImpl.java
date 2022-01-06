@@ -134,6 +134,11 @@ public class UserServiceImpl implements UserService {
                 user.getSecret_code(), APP_NAME), "UTF-8");
     }
     @Override
+    public String generateQRUrl(User user) throws UnsupportedEncodingException {
+        return QR_PREFIX + URLEncoder.encode(String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", APP_NAME, user.getEmail(),
+                user.getSecret_code(), APP_NAME), "UTF-8");
+    }
+    @Override
     public User findByEmail(String email) {
     	User user = userRepository.findByEmail(email);
     	return user;
