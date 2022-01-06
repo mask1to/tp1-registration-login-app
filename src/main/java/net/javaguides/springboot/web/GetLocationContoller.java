@@ -19,13 +19,19 @@ public class GetLocationContoller {
         System.out.println(database);
     }
 
-    public GeoIp getLocation(String ip)
-            throws IOException, GeoIp2Exception {
-        InetAddress ipAddress = InetAddress.getByName(ip);
-        CountryResponse response = dbReader.country(ipAddress);
+    public GeoIp getLocation(String ip) {
 
-        String country = response.getCountry().getName();
+        try {
+            InetAddress ipAddress = InetAddress.getByName(ip);
+            CountryResponse response = dbReader.country(ipAddress);
 
-        return new GeoIp(ip, country);
+            String country = response.getCountry().getName();
+            return new GeoIp(ip, country);
+        }
+        catch(Exception e) {
+
+        }
+
+        return null;
     }
 }
