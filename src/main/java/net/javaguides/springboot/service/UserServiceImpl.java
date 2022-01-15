@@ -39,6 +39,10 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private TemporaryUserRepository temporaryUserRepository;
 
+    public static String QR_PREFIX =
+            "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
+    public static String APP_NAME = "TP";
+
     @Autowired
     private VerificationTokenRepository tokenRepository;
 
@@ -58,7 +62,7 @@ public class UserServiceImpl implements UserService {
                 registrationDto.getEmail(),
                 passwordEncoder.encode(registrationDto.getPassword()),
                 registrationDto.getSecret_code(),
-                registrationDto.getUsingfa(),
+                registrationDto.isUsingfa(),
                 Arrays.asList(new Role("USER")));
 
         return userRepository.save(user);
@@ -67,7 +71,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public TemporaryUser saveEmail(UserEmailDto userEmailDto, RedirectAttributes redirectAttributes) {
         try {
-            TemporaryUser temporaryUser = new TemporaryUser(userEmailDto.getEmail(), Arrays.asList(new Role("TEMP_USER")));
+            TemporaryUser temporaryUser = new TemporaryUser(userEmailDto.getEmail());
             return temporaryUserRepository.save(temporaryUser);
         } catch (DataIntegrityViolationException e) {
             redirectAttributes.addFlashAttribute("error", "User already exists");
@@ -124,10 +128,6 @@ public class UserServiceImpl implements UserService {
         return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 
-    public static String QR_PREFIX =
-            "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
-    public static String APP_NAME = "TP";
-
     @Override
     public String generateQRUrl(UserRegistrationDto user) throws UnsupportedEncodingException {
         return QR_PREFIX + URLEncoder.encode(String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", APP_NAME, user.getEmail(),
@@ -145,16 +145,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean checkcode(User user,String Scode) {
-        Totp totp = new Totp(user.getSecret_code());
+    public boolean checkcode(String secretCode,String code) {
+        Totp totp = new Totp(secretCode);
         try {
-            Long.parseLong(Scode);
+            Long.parseLong(code);
         } catch (NumberFormatException e) {
             return false;
         }
-        if (totp.verify(Scode))
+
+        if (totp.verify(code)) {
             return true;
-        else
-            return false;
+        }
+
+        return false;
     }
 }

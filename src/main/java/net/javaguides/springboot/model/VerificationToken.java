@@ -12,12 +12,12 @@ public class VerificationToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private int id;
 
     private String token;
 
-    @OneToOne(targetEntity = TemporaryUser.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "user_id")
+    @OneToOne
+    @JoinColumn(name = "tempUser_id", nullable = false)
     private TemporaryUser temporaryUser;
 
     private Date expiryDate;
@@ -61,5 +61,9 @@ public class VerificationToken {
 
     public void setTemporaryUser(TemporaryUser temporaryUser) {
         this.temporaryUser = temporaryUser;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

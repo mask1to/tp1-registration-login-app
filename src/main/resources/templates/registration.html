@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
-<head th:replace="includes/header :: header" />
+<head th:replace="includes/header :: header"/>
 <body>
 
-<div th:replace="includes/navbar :: navbar" />
+<div th:replace="includes/navbar :: navbar"/>
 
 <section class="pt-4">
     <div class="container">
@@ -15,44 +15,64 @@
                 <h1>Registration</h1>
 
                 <form th:action="@{/registration}" method="post" th:object="${user}">
+                    <input type="hidden" th:value="${token}" th:name="token">
+                    <div th:if="${reg}">
+                        <div class="form-group">
+                            <label class="control-label" for="firstName"> First Name </label>
+                            <input id="firstName" type="text" class="form-control" th:field="*{firstName}"
+                                   required autofocus="autofocus"/>
+                        </div>
 
-                    <div class="form-group">
-                        <label class="control-label" for="firstName"> First Name </label>
-                        <input id="firstName" class="form-control" th:field="*{firstName}"
-                               required autofocus="autofocus"/>
+
+                        <div class="form-group">
+                            <label class="control-label" for="lastName"> Last Name </label>
+                            <input id="lastName" type="text" class="form-control" th:field="*{lastName}"
+                                   required autofocus="autofocus"/>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="control-label" for="email"> Email </label>
+                            <input id="email" type="email" class="form-control" th:value="${email}" th:name="email"
+                                   readonly autofocus="autofocus"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label" for="password"> Password </label>
+                            <input id="password" type="password" class="form-control" th:field="*{password}"
+                                   required autofocus="autofocus"/>
+                        </div>
+                        <div class="form-group">
+                            Use Two step verification?
+                            <select name="Usingfa" id="Usingfa" th:field="*{Usingfa}" required autofocus="autofocus">
+                                <option value="true">yes</option>
+                                <option value="false">no</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" name="register" class="btn btn-success">Register</button>
+                            <span>Already registered? <a href="/" th:href="@{/login}">Login here</a></span>
+                        </div>
                     </div>
-
-
-                    <div class="form-group">
-                        <label class="control-label" for="lastName"> Last Name </label>
-                        <input id="lastName" class="form-control" th:field="*{lastName}"
-                               required autofocus="autofocus"/>
+                    <div th:if="${gaReg}">
+                        <div id="qr">
+                            <p>Scan this Barcode using Google Authenticator app on your phone to use it later in login
+                                <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2">Android</a>
+                                and
+                                <a href="https://itunes.apple.com/us/app/google-authenticator/id388497605">iPhone</a>
+                            </p>
+                            <br/>
+                            <img th:src="${qr}">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="code"> Code from Google Authenticator: </label>
+                            <input class="form-control" th:field="*{code}"
+                                   required autofocus="autofocus"/>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" name="registerGa" class="btn btn-success">Finish registration</button>
+                        </div>
                     </div>
-
-
-                    <div class="form-group">
-                        <label class="control-label" for="email"> Email </label>
-                        <input id="email" class="form-control" th:field="*{email}"
-                               required autofocus="autofocus"/>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="control-label" for="email"> Password </label>
-                        <input id="password" type="password" class="form-control" th:field="*{password}"
-                               required autofocus="autofocus"/>
-                    </div>
-                    <div class="form-group">
-                        Use Two step verification?
-                        <select name="Usingfa" id="Usingfa" th:field="*{Usingfa}" required autofocus="autofocus">
-                            <option value="true">yes</option>
-                            <option value="false">no</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-success">Register</button>
-                        <span>Already registered? <a href="/" th:href="@{/login}">Login here</a></span>
-                    </div>
-
                 </form>
             </div>
         </div>

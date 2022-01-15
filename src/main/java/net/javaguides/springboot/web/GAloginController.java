@@ -37,12 +37,12 @@ public class GAloginController {
         return new SecretCode();
     }
 
-    @Scheduled(cron = "${purge.cron.expression}")
+    /*@Scheduled(cron = "${purge.cron.expression}")
     public void purgeExpiredTokens()
     {
         Date now = (Date) Date.from(Instant.now());
         tokenRepository.deleteAllExpiredSince(now);
-    }
+    }*/
     @GetMapping
     public String showLoginForm()
     {
@@ -51,12 +51,14 @@ public class GAloginController {
     @PostMapping
     public String loginUser(@ModelAttribute("user") SecretCode secretCode, HttpSession session, RedirectAttributes redirectAttributes){
         User user = userService.findByEmail(session.getAttribute("principal_name").toString());
-        if (userService.checkcode(user,secretCode.getSecret_code()))
+        /*if (userService.checkcode(user,secretCode.getSecret_code()))
             return "redirect:/";
         else {
             redirectAttributes.addFlashAttribute("error", "Wrong code");
             return "redirect:/GAlogin";
-        }
+        }*/
+
+        return null;
 
     }
 }

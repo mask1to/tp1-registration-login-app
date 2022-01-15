@@ -1,8 +1,6 @@
 package net.javaguides.springboot.model;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.List;
 
 @Entity
 @Table(name="temp_users", uniqueConstraints={@UniqueConstraint(columnNames={"email"})})
@@ -10,7 +8,7 @@ public class TemporaryUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(name = "email")
     private String email;
@@ -18,35 +16,29 @@ public class TemporaryUser {
     @Column(name = "enabled")
     private boolean enabled;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "temp_users_roles",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-    private Collection<Role> roles;
+    @OneToOne(cascade = CascadeType.ALL,mappedBy="temporaryUser")
+    private VerificationToken verificationToken;
 
     public TemporaryUser() {
 
     }
 
-    public TemporaryUser(Long id, String email, boolean enabled, Collection<Role> roles) {
+    public TemporaryUser(int id, String email, boolean enabled) {
         this.id = id;
         this.email = email;
-        this.roles = roles;
         this.enabled = false;
     }
 
-    public TemporaryUser(String email, Collection<Role> roles) {
+    public TemporaryUser(String email) {
         super();
         this.email = email;
-        this.roles = roles;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -73,15 +65,6 @@ public class TemporaryUser {
                 "id=" + id +
                 ", email='" + email + '\'' +
                 ", enabled=" + enabled +
-                ", roles=" + roles +
                 '}';
-    }
-
-    public Collection<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Collection<Role> roles) {
-        this.roles = roles;
     }
 }

@@ -1,6 +1,7 @@
 package net.javaguides.springboot.web;
 
 import net.javaguides.springboot.model.TemporaryUser;
+import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.service.UserService;
 import net.javaguides.springboot.web.dto.UserEmailDto;
 import net.javaguides.springboot.web.dto.UserRegistrationDto;
@@ -56,7 +57,8 @@ public class UserLandingController
     {
         try {
             TemporaryUser temporaryUser = userService.saveEmail(userEmailDto, redirectAttributes);
-            if(temporaryUser == null) {
+            User user = userService.findByEmail(userEmailDto.getEmail());
+            if(temporaryUser == null || user != null) {
                 redirectAttributes.addFlashAttribute("error", "User already exists");
                 return "redirect:/welcome";
             }

@@ -11,5 +11,5 @@ public interface TemporaryUserRepository extends JpaRepository<TemporaryUser, Lo
     TemporaryUser findByEmail(String email);
 
     @Transactional
-    TemporaryUser deleteByEmail(String email);
+    Integer deleteTemporaryUserByEmail(String email);
 }

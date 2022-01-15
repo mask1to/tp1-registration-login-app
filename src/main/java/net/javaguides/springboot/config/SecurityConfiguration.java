@@ -25,6 +25,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.LinkedMultiValueMap;
@@ -64,7 +65,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
-        auth.setUserDetailsService(userService);
+        auth.setUserDetailsService((UserDetailsService) userService);
         auth.setPasswordEncoder(passwordEncoder());
         return auth;
     }
@@ -100,12 +101,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     httpServletRequest.getSession().setAttribute("principal_name", authentication.getName());
                     httpServletRequest.getSession().setMaxInactiveInterval(300);
                     GetLocationContoller locationContoller = new GetLocationContoller();
-                    try {
+                    /*try {
                         GeoIp geoIp = locationContoller.getLocation(httpServletRequest.getRemoteAddr());
                         System.out.println(geoIp.getCountry());
                     } catch (GeoIp2Exception e) {
                         e.printStackTrace();
-                    }
+                    }*/
 
                     User user = userService.findByEmail(authentication.getName());
                     if (user.getUsingfa() ||  riskValue  >= 2 ) {

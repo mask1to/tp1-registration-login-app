@@ -27,5 +27,5 @@ public interface UserService extends UserDetailsService {
 	String generateQRUrl(UserRegistrationDto user) throws UnsupportedEncodingException;
 	String generateQRUrl(User user) throws UnsupportedEncodingException;
 	User findByEmail(String email);
-	boolean checkcode(User user,String Scode);
+	boolean checkcode(String secretCode,String code);
 }
