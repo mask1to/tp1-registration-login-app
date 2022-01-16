@@ -19,12 +19,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -42,6 +48,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Date;
 
@@ -98,8 +105,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     // call na risk server
                     int riskValue = callRiskServer();
 
-                    httpServletRequest.getSession().setAttribute("principal_name", authentication.getName());
-                    httpServletRequest.getSession().setMaxInactiveInterval(300);
                     GetLocationContoller locationContoller = new GetLocationContoller();
                     /*try {
                         GeoIp geoIp = locationContoller.getLocation(httpServletRequest.getRemoteAddr());
@@ -112,8 +117,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     if (user.getUsingfa() ||  riskValue  >= 2 ) {
                         httpServletResponse.sendRedirect("/GAlogin");
                     }
-                    else
+                    else {
+                        httpServletRequest.getSession().setAttribute("principal_name", authentication.getName());
+                        httpServletRequest.getSession().setMaxInactiveInterval(300);
+                        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(auth.getAuthorities());
+                        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
+                        SecurityContextHolder.getContext().setAuthentication(newAuth);
                         httpServletResponse.sendRedirect("/");
+                    }
                 })
                 .and()
                 .logout()
@@ -176,17 +189,5 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         }
 
         return 0;
-
-
-
-
-    }
-
-    private void evaluateRiskServer(String token) {
-
-
-
-
-
     }
 }

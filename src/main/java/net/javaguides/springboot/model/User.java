@@ -64,6 +64,7 @@ public class User
 		this.enabled = true;
 	}
 
+
 	public User(String email, Collection<Role> roles) {
 		super();
 		this.email = email;
