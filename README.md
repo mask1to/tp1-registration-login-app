@@ -5,10 +5,10 @@ HOW TO DEPLOY with Docker:
 
 Update application properties first 4 rows:
 
-spring.datasource.url=jdbc:postgresql://postgres:5432/postgres
+`spring.datasource.url=jdbc:postgresql://postgres:5432/postgres
 spring.datasource.username=postgres
 spring.datasource.password=admin
-server.port=8080
+server.port=8080`
 
 
 1. in pom.xml replace last <build> tag with this:
