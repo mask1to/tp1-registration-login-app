@@ -4,9 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.Date;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import net.javaguides.springboot.model.TemporaryUser;
@@ -63,7 +61,7 @@ public class UserServiceImpl implements UserService {
                 passwordEncoder.encode(registrationDto.getPassword()),
                 registrationDto.getSecret_code(),
                 registrationDto.isUsingfa(),
-                Arrays.asList(new Role("USER")));
+                Arrays.asList(new Role("ROLE_PRE_USER")));
 
         return userRepository.save(user);
     }
@@ -121,12 +119,19 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UsernameNotFoundException("Invalid Email or password");
         }
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), mapRolesToAuthorities(user.getRoles()));
+
+        Set<GrantedAuthority> grantedAuthorities = new HashSet<>(); // use list if you wish
+        for (Role role : user.getRoles()) {
+            grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
+        }
+
+        System.out.println("Rola " + user.getRoles());
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), grantedAuthorities);
     }
 
-    private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
-    }
+    /*private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
+        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName()));
+    }*/
 
     @Override
     public String generateQRUrl(UserRegistrationDto user) throws UnsupportedEncodingException {

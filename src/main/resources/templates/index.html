@@ -10,7 +10,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="alert alert-primary" role="alert" th:text="${success}" th:if="${success}"></div>
-                <div sec:authorize="isAuthenticated()">
+                <div sec:authorize="isAuthenticated() && hasRole('ROLE_USER')">
                     <h1>You have logged successfully!</h1>
                     Welcome <span sec:authentication="principal.username"> User</span>
                 </div>
