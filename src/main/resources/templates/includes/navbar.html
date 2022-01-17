@@ -7,13 +7,16 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav w-100">
-            <li th:classappend="${#httpServletRequest.getRequestURI() == '/' ? 'active':''}" class="nav-item">
+            <li sec:authorize="!isAuthenticated() || !hasRole('ROLE_USER')"th:classappend="${#httpServletRequest.getRequestURI() == '/' ? 'active':''}" class="nav-item">
                 <a class="nav-link" th:href="@{/}">Home <span class="sr-only">(current)</span></a>
             </li>
-            <li th:classappend="${#httpServletRequest.getRequestURI() == '/login' ? 'active':''}" class="nav-item" sec:authorize="!isAuthenticated()">
+            <li sec:authorize="isAuthenticated() && hasRole('ROLE_USER')" th:classappend="${#httpServletRequest.getRequestURI() == '/home' ? 'active':''}" class="nav-item">
+                <a class="nav-link" th:href="@{/home}">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li th:classappend="${#httpServletRequest.getRequestURI() == '/login' ? 'active':''}" class="nav-item" sec:authorize="!isAuthenticated() || !hasRole('ROLE_USER')">
                 <a class="nav-link" th:href="@{/login}">Log in</a>
             </li>
-            <li th:classappend="${#httpServletRequest.getRequestURI() == '/welcome' || #httpServletRequest.getRequestURI() == '/registration' ? 'active':''}" class="nav-item" sec:authorize="!isAuthenticated()">
+            <li th:classappend="${#httpServletRequest.getRequestURI() == '/welcome' || #httpServletRequest.getRequestURI() == '/registration' ? 'active':''}" class="nav-item" sec:authorize="!isAuthenticated() || !hasRole('ROLE_USER')">
                 <a class="nav-link" th:href="@{/welcome}">Registration</a>
             </li>
             <li th:classappend="${#httpServletRequest.getRequestURI() == '/about-team' || #httpServletRequest.getRequestURI() == '/registration' ? 'active':''}" class="nav-item">

@@ -7,6 +7,7 @@ import net.javaguides.springboot.web.dto.SecretCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -52,8 +53,16 @@ public class GAloginController {
         tokenRepository.deleteAllExpiredSince(now);
     }*/
     @GetMapping
-    public String showLoginForm() {
-        return "GAlogin";
+    public String showLoginForm(HttpServletRequest httpServletRequest) {
+
+        if (httpServletRequest.isUserInRole("ROLE_PRE_USER")) {
+            return "GAlogin";
+        }
+        else if (httpServletRequest.isUserInRole("ROLE_USER")) {
+            return "redirect:/home";
+        }
+
+        return "redirect:/";
     }
 
     @PostMapping
@@ -69,8 +78,7 @@ public class GAloginController {
             SecurityContextHolder.getContext().setAuthentication(newAuth);
 
             return "redirect:/";
-        }
-        else{
+        } else {
             redirectAttributes.addFlashAttribute("error", "Wrong code");
             return "redirect:/GAlogin";
         }

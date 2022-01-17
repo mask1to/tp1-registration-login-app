@@ -76,11 +76,11 @@ public class UserRegistrationController {
     }
 
     @RequestMapping(value = "/registration", method = RequestMethod.GET)
-    public String showRegistrationForm(HttpSession session, @RequestParam("token") Optional<String> token, Model model) {
+    public String showRegistrationForm(HttpServletRequest httpServletRequest, @RequestParam("token") Optional<String> token, Model model) {
         VerificationToken verificationToken = userService.getVerificationToken(token);
 
-        if (session.getAttribute("principal_name") != null) {
-            return "redirect:/";
+        if (httpServletRequest.isUserInRole("ROLE_USER")) {
+            return "redirect:/home";
         } else if (verificationToken == null) {
             return "/badToken";
         }
