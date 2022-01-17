@@ -16,47 +16,23 @@ import java.util.List;
 public class MainController {
 
     @GetMapping("/login")
-    public String login(HttpSession session) {
-        if (session.getAttribute("principal_name") != null) {
-            return "redirect:/";
+    public String login(HttpServletRequest httpServletRequest) {
+        if (httpServletRequest.isUserInRole("ROLE_USER")) {
+            return "redirect:/home";
+        }
+        else if (httpServletRequest.isUserInRole("ROLE_PRE_USER")) {
+            return "redirect:/GAlogin";
         }
 
         return "login";
     }
 
     @GetMapping("/")
-    public String home(Model model, HttpSession session, HttpServletRequest request) {
+    public String index(HttpServletRequest httpServletRequest) {
 
-        Date d = new Date(session.getCreationTime());
-
-        model.addAttribute("sessionEx", d);
-        model.addAttribute("ipaddr", request.getRemoteAddr());
-        UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
-
-        model.addAttribute("bname", userAgent.getBrowser().getName());
-        model.addAttribute("bversion", userAgent.getBrowserVersion());
-
-        String browserDetails = request.getHeader("User-Agent");
-        String userAgent1 = browserDetails;
-        String os = "";
-
-        if (userAgent1.toLowerCase().indexOf("windows") >= 0) {
-            os = "Windows";
-        } else if (userAgent1.toLowerCase().indexOf("mac") >= 0) {
-            os = "Mac";
-        } else if (userAgent1.toLowerCase().indexOf("x11") >= 0) {
-            os = "Unix";
-        } else if (userAgent1.toLowerCase().indexOf("android") >= 0) {
-            os = "Android";
-        } else if (userAgent1.toLowerCase().indexOf("iphone") >= 0) {
-            os = "IPhone";
-        } else {
-            os = "UnKnown, More-Info: " + userAgent;
+        if (httpServletRequest.isUserInRole("ROLE_USER")) {
+            return "redirect:/home";
         }
-
-
-        model.addAttribute("os", os);
-
 
         return "index";
     }
@@ -69,5 +45,16 @@ public class MainController {
     @GetMapping("/about-team")
     public String aboutTeam() {
         return "about-team";
+    }
+
+    @GetMapping("/home")
+    public String home(HttpServletRequest httpServletRequest) {
+
+        if (httpServletRequest.isUserInRole("ROLE_USER")) {
+            return "home";
+        }
+
+        return "redirect:/";
+
     }
 }

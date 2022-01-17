@@ -44,10 +44,10 @@ public class UserLandingController
     }
 
     @GetMapping
-    public String showRegistrationLanding(HttpSession session)
+    public String showRegistrationLanding(HttpServletRequest httpServletRequest)
     {
-        if(session.getAttribute("principal_name") != null) {
-            return "redirect:/";
+        if (httpServletRequest.isUserInRole("ROLE_USER")) {
+            return "redirect:/home";
         }
         return "welcome";
     }

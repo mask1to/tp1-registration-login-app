@@ -16,7 +16,6 @@ public class GetLocationContoller {
         File database = new File("src/main/resources/CountriesDB/GeoLite2-Country.mmdb");
         dbReader = new DatabaseReader.Builder(database).build();
 
-        System.out.println(database);
     }
 
     public GeoIp getLocation(String ip) {

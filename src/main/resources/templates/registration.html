@@ -43,10 +43,10 @@
                                    required autofocus="autofocus"/>
                         </div>
                         <div class="form-group">
-                            Use Two step verification?
-                            <select name="Usingfa" id="Usingfa" th:field="*{Usingfa}" required autofocus="autofocus">
-                                <option value="true">yes</option>
-                                <option value="false">no</option>
+                            <label class="control-label" for="Usingfa">Do you want to use 2FA?</label>
+                            <select id="Usingfa" class="custom-select" th:field="*{Usingfa}" required autofocus="autofocus">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -82,5 +82,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF"
         crossorigin="anonymous"></script>
+
 </body>
 </html>
