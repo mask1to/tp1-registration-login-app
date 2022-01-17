@@ -12,9 +12,13 @@
 }
 .single_team_content p{}
 .our-team {
-    margin-bottom: 30px;
     box-shadow: 0 10px 40px -10px rgba(0,64,128,.09);
 }
+
+.team-wrapper {
+    margin-bottom: 30px;
+}
+
 .our-team .team_img{
     position: relative;
     overflow: hidden;
@@ -35,6 +39,9 @@
 .our-team img{
     width: 100%;
     height: auto;
+    max-height: 255px;
+    object-fit: cover;
+    object-position: top;
 }
 .our-team .social{
     padding: 0 0 18px 0;
