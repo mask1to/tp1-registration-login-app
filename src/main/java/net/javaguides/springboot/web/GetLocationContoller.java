@@ -4,16 +4,19 @@ import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CountryResponse;
 import net.javaguides.springboot.model.GeoIp;
+import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 
 public class GetLocationContoller {
     private DatabaseReader dbReader;
 
     public GetLocationContoller() throws IOException {
-        File database = new File("src/main/resources/CountriesDB/GeoLite2-Country.mmdb");
+        InputStream database = getClass().getResourceAsStream("/CountriesDB/GeoLite2-Country.mmdb");
+
         dbReader = new DatabaseReader.Builder(database).build();
 
     }
