@@ -29,6 +29,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -124,9 +125,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     int riskValue = callRiskServer(date, ipAddress, country, operatingSystem, browser, browserVersion, authentication.getName());
 
                     User user = userService.findByEmail(authentication.getName());
-                    if (user.getUsingfa() || riskValue >= 2) {
+
+                    if(riskValue == 4) {
+                        SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
+                        securityContextLogoutHandler.logout(httpServletRequest, httpServletResponse, null);
+                        httpServletResponse.sendRedirect("/?blacklist");
+                        return;
+                    }
+
+                    if (user.getUsingfa() && riskValue >= 2) {
                         httpServletResponse.sendRedirect("/GAlogin");
-                    } else {
+                    }
+                    else {
                         httpServletRequest.getSession().setAttribute("principal_name", authentication.getName());
                         httpServletRequest.getSession().setMaxInactiveInterval(300);
                         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -189,7 +199,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             logger.info(String.valueOf(errorpayload));
             // ako riesit nedostupnost risk servera???
         }
-        if (risk_result.equals("high risk")) {
+
+        if (risk_result.equals("blacklist")) {
+            return 4;
+        } else if (risk_result.equals("high risk")) {
             return 3;
         } else if (risk_result.equals("medium risk")) {
             return 2;

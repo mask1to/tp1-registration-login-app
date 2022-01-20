@@ -10,6 +10,8 @@
         <div class="row">
             <div class="col-12">
                 <div class="alert alert-primary" role="alert" th:text="${success}" th:if="${success}"></div>
+
+                <div class="alert alert-danger" role="alert" th:if="${param.blacklist}">Your country is on the black list!</div>
                 <div>
                     <h1>Welcome and log in!</h1>
                 </div>

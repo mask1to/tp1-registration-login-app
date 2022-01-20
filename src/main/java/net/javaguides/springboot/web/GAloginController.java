@@ -55,7 +55,10 @@ public class GAloginController {
     @GetMapping
     public String showLoginForm(HttpServletRequest httpServletRequest) {
 
-        if (httpServletRequest.isUserInRole("ROLE_PRE_USER")) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByEmail(auth.getName());
+
+        if (httpServletRequest.isUserInRole("ROLE_PRE_USER") && user.getUsingfa()) {
             return "GAlogin";
         }
         else if (httpServletRequest.isUserInRole("ROLE_USER")) {
