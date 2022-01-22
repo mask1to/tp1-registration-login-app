@@ -74,6 +74,11 @@ public class MainController {
         return "about-team";
     }
 
+    @GetMapping("/project-presentation")
+    public String projectPresentation() {
+        return "project-presentation";
+    }
+
     @GetMapping("/home")
     public String home(HttpServletRequest httpServletRequest) {
 

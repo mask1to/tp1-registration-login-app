@@ -78,6 +78,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/registration**",
                         "/registrationQR**",
                         "/about-team**",
+                        "/project-presentation**",
                         "/js/**",
                         "/css/**",
                         "/img/**",
