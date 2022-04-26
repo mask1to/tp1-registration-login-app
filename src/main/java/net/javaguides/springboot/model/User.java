@@ -3,24 +3,15 @@ package net.javaguides.springboot.model;
 import org.jboss.aerogear.security.otp.api.Base32;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 @Entity
 @Table(name="users", uniqueConstraints={@UniqueConstraint(columnNames={"email"})})
-public class User 
+public class User
 {
 	
 	@Id
@@ -35,46 +26,54 @@ public class User
 	
 //	@Column(unique = true)
 	private String email;
-	private String secret_code= Base32.random();
+
 	@Column(name = "usingfa")
 	private boolean Usingfa;
+
+	@Column(name = "phone_code")
+	private String phoneCode;
+
+	@Column(name = "phone_number")
+	private String phoneNumber;
+
+	@Column(name = "authy_id")
+	private String authyId;
+
 	private String password;
 
 	@Column(name = "enabled")
 	private boolean enabled;
-	
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinTable(
-			name = "users_roles",
-			joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-			inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
 	private Collection<Role> roles;
 	
 	public User() {}
 	
-	public User(String firstName, String lastName, String email, String password,String secret_code,boolean Usingfa, Collection<Role> roles) {
+	public User(String firstName, String lastName, String email, String password, boolean Usingfa, Collection<Role> roles, String phoneCode, String phoneNumber, String authyId) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
 		this.password = password;
 		this.roles = roles;
-		this.secret_code=secret_code;
 		this.Usingfa=Usingfa;
 		this.enabled = true;
+		this.phoneCode = phoneCode;
+		this.phoneNumber = phoneNumber;
+		this.authyId = authyId;
 	}
 
 
-	public User(String email, Collection<Role> roles) {
+	public User(String email, Set<Role> roles) {
 		super();
 		this.email = email;
 		this.roles = roles;
 	}
 
-	public User(String email, String secret_code){
+	public User(String email){
 		super();
 		this.email=email;
-		this.secret_code=secret_code;
 	}
     public Long getId() {
 		return id;
@@ -116,20 +115,48 @@ public class User
 		this.password = password;
 	}
 
-	public String getSecret_code() {
-		return secret_code;
-	}
-
-	public void setSecret_code(String secret_code) {
-		this.secret_code = secret_code;
-	}
-
 	public boolean getUsingfa() {
 		return Usingfa;
 	}
 
 	public void setUsingfa(boolean isusingfa) {
 		this.Usingfa = isusingfa;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public String getAuthyId() {
+		return authyId;
+	}
+
+	public void setAuthyId(String authyId) {
+		this.authyId = authyId;
+	}
+
+	public String getPhoneCode() {
+		return phoneCode;
+	}
+
+	public void setPhoneCode(String phoneCode) {
+		this.phoneCode = phoneCode;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public boolean isUsingfa() {
+		return Usingfa;
 	}
 
 	public Collection<Role> getRoles() {
@@ -142,15 +169,18 @@ public class User
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
-				+ ", password=" + password + ", secret_code=" + secret_code + ", roles=" + roles + "]";
-	}
-
-	public boolean isEnabled() {
-		return enabled;
-	}
-
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
+		return "User{" +
+				"id=" + id +
+				", firstName='" + firstName + '\'' +
+				", lastName='" + lastName + '\'' +
+				", email='" + email + '\'' +
+				", Usingfa=" + Usingfa +
+				", phoneCode='" + phoneCode + '\'' +
+				", phoneNumber='" + phoneNumber + '\'' +
+				", authyId='" + authyId + '\'' +
+				", password='" + password + '\'' +
+				", enabled=" + enabled +
+				", roles=" + roles +
+				'}';
 	}
 }

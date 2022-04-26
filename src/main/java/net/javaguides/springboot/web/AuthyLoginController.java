@@ -1,42 +1,44 @@
 package net.javaguides.springboot.web;
 
+import com.authy.AuthyApiClient;
+import com.authy.AuthyException;
+import com.authy.api.Token;
+import com.authy.api.Tokens;
 import net.javaguides.springboot.model.User;
-import net.javaguides.springboot.repository.VerificationTokenRepository;
 import net.javaguides.springboot.service.UserService;
 import net.javaguides.springboot.web.dto.SecretCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.sql.Date;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-
 @Controller
-@RequestMapping("/GAlogin")
-public class GAloginController {
+@RequestMapping("/authyLogin")
+public class AuthyLoginController {
     @Autowired
     ApplicationEventPublisher eventPublisher;
 
     private UserService userService;
-    private VerificationTokenRepository tokenRepository;
 
+    @Value( "${authy.api}" )
+    private String API_KEY;
 
-    public GAloginController(UserService userService) {
+    public AuthyLoginController(UserService userService) {
         super();
         this.userService = userService;
     }
@@ -46,12 +48,6 @@ public class GAloginController {
         return new SecretCode();
     }
 
-    /*@Scheduled(cron = "${purge.cron.expression}")
-    public void purgeExpiredTokens()
-    {
-        Date now = (Date) Date.from(Instant.now());
-        tokenRepository.deleteAllExpiredSince(now);
-    }*/
     @GetMapping
     public String showLoginForm(HttpServletRequest httpServletRequest) {
 
@@ -59,7 +55,7 @@ public class GAloginController {
         User user = userService.findByEmail(auth.getName());
 
         if (httpServletRequest.isUserInRole("ROLE_PRE_USER") && user.getUsingfa()) {
-            return "GAlogin";
+            return "authyLogin";
         }
         else if (httpServletRequest.isUserInRole("ROLE_USER")) {
             return "redirect:/home";
@@ -69,21 +65,24 @@ public class GAloginController {
     }
 
     @PostMapping
-    public String loginUser(@ModelAttribute("user") SecretCode secretCode, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String loginUser(@ModelAttribute("user") SecretCode secretCode, HttpSession session, RedirectAttributes redirectAttributes) throws AuthyException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByEmail(auth.getName());
+        AuthyApiClient client = new AuthyApiClient(API_KEY);
 
-        if (userService.checkcode(user.getSecret_code(), secretCode.getSecret_code())) {
+        Tokens tokens = client.getTokens();
+        Token response = tokens.verify(Integer.valueOf(user.getAuthyId()), secretCode.getSecret_code());
+
+        if (response.isOk()) {
 
             List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(auth.getAuthorities());
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
             Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
             SecurityContextHolder.getContext().setAuthentication(newAuth);
-
             return "redirect:/";
         } else {
-            redirectAttributes.addFlashAttribute("error", "Wrong code");
-            return "redirect:/GAlogin";
+            redirectAttributes.addFlashAttribute("error", response.getError());
+            return "redirect:/authyLogin";
         }
     }
 }

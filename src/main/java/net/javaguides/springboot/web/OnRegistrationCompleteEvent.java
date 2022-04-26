@@ -1,7 +1,6 @@
 package net.javaguides.springboot.web;
 
 import net.javaguides.springboot.model.TemporaryUser;
-import net.javaguides.springboot.model.User;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.Locale;

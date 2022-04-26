@@ -3,19 +3,15 @@ package net.javaguides.springboot.config;
 import eu.bitwalker.useragentutils.UserAgent;
 import eu.bitwalker.useragentutils.Version;
 import net.javaguides.springboot.model.GeoIp;
-import net.javaguides.springboot.model.Transaction;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.service.AddrService;
 import net.javaguides.springboot.service.UserService;
 import net.javaguides.springboot.web.GetLocationContoller;
-import org.apache.tomcat.util.codec.binary.Base64;
-import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.javaguides.springboot.web.RiskServerController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.*;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -31,8 +27,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -40,16 +34,12 @@ import java.util.Date;
 import java.util.List;
 
 @Configuration
+@EnableAsync
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
-
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private AddrService addrService;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -74,17 +64,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers(
-                        "/welcome**",
-                        "/registration**",
-                        "/registrationQR**",
-                        "/about-team**",
-                        "/project-presentation**",
+                        "/welcome",
+                        "/registration",
+                        "/about-team",
+                        "/project-presentation",
                         "/js/**",
                         "/css/**",
                         "/img/**",
-                        "/**").permitAll()
-                .antMatchers("/GAlogin", "/home").hasRole("PRE_USER")
+                        "/404").permitAll()
+                .antMatchers("/all-users").access("hasRole('ADMIN')")
+                .antMatchers("/authyLogin", "/home", "/authyNotificationLogin").hasRole("PRE_USER")
                 .anyRequest().authenticated()
+                .and().exceptionHandling()
+                .accessDeniedPage("/404")
                 .and()
                 .formLogin()
                 .loginPage("/login")
@@ -123,7 +115,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         country = "No country";
                     }
 
-                    int riskValue = callRiskServer(date, ipAddress, country, operatingSystem, browser, browserVersion, authentication.getName());
+                    RiskServerController riskServer = new RiskServerController();
+
+                    int riskValue = 2;  //.callRiskServer(date, ipAddress, country, operatingSystem, browser, browserVersion, authentication.getName(), "login");
 
                     User user = userService.findByEmail(authentication.getName());
 
@@ -135,7 +129,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     }
 
                     if (user.getUsingfa() && riskValue >= 2) {
-                        httpServletResponse.sendRedirect("/GAlogin");
+                        httpServletResponse.sendRedirect("/authyLogin");
                     }
                     else {
                         httpServletRequest.getSession().setAttribute("principal_name", authentication.getName());
@@ -157,60 +151,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     httpServletRequest.getSession().invalidate();
                     httpServletResponse.sendRedirect("/login?logout");
                 }).and()
+                .exceptionHandling()
+                .accessDeniedPage("/404")
+                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .maximumSessions(1)
                 .expiredUrl("/login?error");
-    }
-
-    private int callRiskServer(Date date, String ipAddress, String country, String operatingSystem, String browser, Version browserVersion, String email) {
-        String url = "https://serene-refuge-96326.herokuapp.com/oauth/token?scope=write&grant_type=password&username=foo&password=foo";
-//        String url = "http://localhost:8080/oauth/token?scope=write&grant_type=password&username=foo&password=foo";
-        RestTemplate rt = new RestTemplate();
-
-        String plainCreds = "clientId:abcd";
-        byte[] plainCredsBytes = plainCreds.getBytes();
-        byte[] base64CredsBytes = Base64.encodeBase64(plainCredsBytes);
-        String base64Creds = new String(base64CredsBytes);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Basic " + base64Creds);
-
-        HttpEntity<String> request = new HttpEntity<String>(headers);
-        ResponseEntity<?> response = rt.exchange(url, HttpMethod.POST, request, JSONObject.class);
-        JSONObject jsontoken = (JSONObject) response.getBody();
-        String token = (String) jsontoken.get("access_token");
-        logger.info(token);
-
-//        url = "http://localhost:8080/evaluate";
-        url = "https://serene-refuge-96326.herokuapp.com/evaluate";
-        rt = new RestTemplate();
-        headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        Transaction body = new Transaction(date, ipAddress, "login", country, operatingSystem, browser, browserVersion, email);
-        HttpEntity<Transaction> entity = new HttpEntity<Transaction>(body, headers);
-        String risk_result = null;
-        try {
-            ResponseEntity<String> responseValue = rt.exchange(url, HttpMethod.POST, entity, String.class);
-            risk_result = responseValue.getBody();
-            logger.info(risk_result);
-        } catch (HttpStatusCodeException e) {
-            String errorpayload = e.getResponseBodyAsString();
-            logger.info(String.valueOf(errorpayload));
-            // ako riesit nedostupnost risk servera???
-        }
-
-        if (risk_result.equals("blacklist")) {
-            return 4;
-        } else if (risk_result.equals("high risk")) {
-            return 3;
-        } else if (risk_result.equals("medium risk")) {
-            return 2;
-        } else if (risk_result.equals("low risk")) {
-            return 1;
-        }
-
-        return 0;
     }
 }

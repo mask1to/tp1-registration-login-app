@@ -1,7 +1,5 @@
 package net.javaguides.springboot.web.dto;
 
-import org.jboss.aerogear.security.otp.api.Base32;
-
 public class UserRegistrationDto {
 
 	private String firstName;
@@ -9,13 +7,13 @@ public class UserRegistrationDto {
 	private String email;
 	private String password;
 	private boolean Usingfa;
-	private String secret_code;
+	private String phoneNumber_phoneCode;
+	private String phoneNumber;
 	private String token;
-	private String code;
 
 	public UserRegistrationDto(){}
 
-	public UserRegistrationDto(String firstName, String lastName, String email, String password,boolean Usingfa, String token) {
+	public UserRegistrationDto(String firstName, String lastName, String email, String password,boolean Usingfa, String token, String phoneNumber, String phoneNumber_phoneCode) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -23,6 +21,8 @@ public class UserRegistrationDto {
 		this.password = password;
 		this.Usingfa = Usingfa;
 		this.token = token;
+		this.phoneNumber_phoneCode = phoneNumber_phoneCode;
+		this.phoneNumber = phoneNumber;
 	}
 
 	public String getFirstName() {
@@ -65,14 +65,6 @@ public class UserRegistrationDto {
 		Usingfa = usingfa;
 	}
 
-	public String getSecret_code() {
-		return secret_code;
-	}
-
-	public void setSecret_code(String secret_code) {
-		this.secret_code = secret_code;
-	}
-
 	public String getToken() {
 		return token;
 	}
@@ -81,12 +73,20 @@ public class UserRegistrationDto {
 		this.token = token;
 	}
 
-	public String getCode() {
-		return code;
+	public String getPhoneNumber_phoneCode() {
+		return phoneNumber_phoneCode;
 	}
 
-	public void setCode(String code) {
-		this.code = code;
+	public void setPhoneNumber_phoneCode(String phoneNumber_phoneCode) {
+		this.phoneNumber_phoneCode = phoneNumber_phoneCode;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
 }
 

@@ -4,9 +4,6 @@ import net.javaguides.springboot.model.TemporaryUser;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.service.UserService;
 import net.javaguides.springboot.web.dto.UserEmailDto;
-import net.javaguides.springboot.web.dto.UserRegistrationDto;
-import net.javaguides.springboot.web.exceptions.UserAlreadyExistAuthenticationException;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,10 +13,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.security.acls.model.AlreadyExistsException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/welcome")

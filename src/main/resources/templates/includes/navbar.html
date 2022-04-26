@@ -25,7 +25,10 @@
             <li th:classappend="${#httpServletRequest.getRequestURI() == '/project-presentation' ? 'active':''}" class="nav-item">
                 <a class="nav-link" th:href="@{/project-presentation}">Project presentation</a>
             </li>
-            <li class="nav-item ml-auto" sec:authorize="isAuthenticated() && hasRole('ROLE_USER')">
+            <li th:classappend="${#httpServletRequest.getRequestURI() == '/all-users' ? 'active':''}" class="nav-item" sec:authorize="hasRole('ROLE_ADMIN') && hasRole('ROLE_USER')">
+                <a class="nav-link" th:href="@{/all-users}">All users</a>
+            </li>
+            <li class="nav-item ml-auto" sec:authorize="isAuthenticated()">
                 <a class="btn btn-danger" th:href="@{/logout}">Logout</a>
             </li>
         </ul>

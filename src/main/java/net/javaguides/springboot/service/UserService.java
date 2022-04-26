@@ -1,21 +1,23 @@
 package net.javaguides.springboot.service;
 
+import net.javaguides.springboot.model.Role;
 import net.javaguides.springboot.model.TemporaryUser;
+import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.model.VerificationToken;
 import net.javaguides.springboot.web.dto.UserEmailDto;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.web.dto.UserRegistrationDto;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService extends UserDetailsService {
 
-	User save(UserRegistrationDto registrationDto);
+	User save(UserRegistrationDto registrationDto, String authyId);
 	TemporaryUser saveEmail(UserEmailDto userEmailDto, RedirectAttributes redirectAttributes) throws ConstraintViolationException;
 	TemporaryUser getTemporaryUser(String verificationToken);
 	TemporaryUser getTemporaryUserByMail(String mail);
@@ -24,8 +26,8 @@ public interface UserService extends UserDetailsService {
 	void createVerificationToken(TemporaryUser temporaryUser, String token);
 	void saveRegisteredUser(TemporaryUser temporaryUser);
 	void removeByMail(String mail);
-	String generateQRUrl(UserRegistrationDto user) throws UnsupportedEncodingException;
-	String generateQRUrl(User user) throws UnsupportedEncodingException;
 	User findByEmail(String email);
 	boolean checkcode(String secretCode,String code);
+	List<User> allUsers();
+	List<Role> allRoles();
 }

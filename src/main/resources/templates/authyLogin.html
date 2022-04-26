@@ -12,9 +12,9 @@
         <div class="row">
             <div class="col-md-6 col-md-offset-3">
                 <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
-                <form th:action="@{/GAlogin}" method="post" th:object="${user}">
+                <form th:action="@{/authyLogin}" method="post" th:object="${user}">
                     <div class="form-group">
-                        <label class="control-label" for="secret_code"> Code from Google Authenticator: </label>
+                        <label class="control-label" for="secret_code"> Code from Authy: </label>
                         <input id="secret_code" class="form-control" th:field="*{secret_code}"
                                required autofocus="autofocus"/>
                     </div>
@@ -22,7 +22,7 @@
                         <button type="submit" class="btn btn-success">Finish login</button>
                     </div>
                 </form>
-
+                <a class="d-inline-block text-underline" th:href="@{/authyNotificationLogin}">Use notification</a>
             </div>
         </div>
     </div>

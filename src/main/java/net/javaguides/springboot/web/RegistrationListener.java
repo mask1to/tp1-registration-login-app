@@ -1,7 +1,6 @@
 package net.javaguides.springboot.web;
 
 import net.javaguides.springboot.model.TemporaryUser;
-import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,7 +44,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
         SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(recipientAddress);
         email.setSubject(subject);
-        email.setText("\r\n" + "http://147.175.105.115:8080" + confirmationUrl);
+        email.setText("\r\n" + "http://localhost:8081" + confirmationUrl);
         mailSender.send(email);
     }
 
