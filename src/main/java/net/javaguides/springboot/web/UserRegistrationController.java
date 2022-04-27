@@ -57,12 +57,6 @@ public class UserRegistrationController {
         this.verificationTokenRepository = verificationTokenRepository;
     }
 
-    @Scheduled(cron = "${purge.cron.expression}")
-    public void purgeExpiredTokens() {
-        Date now = (Date) Date.from(Instant.now());
-        verificationTokenRepository.deleteAllExpiredSince(now);
-    }
-
     @ModelAttribute("user")
     public UserRegistrationDto UserRegistrationDto() {
         return new UserRegistrationDto();
@@ -176,7 +170,6 @@ public class UserRegistrationController {
         AuthyApiClient client = new AuthyApiClient(API_KEY);
 
         Users users = client.getUsers();
-        System.out.println(this.registrationDto.getEmail() + " " + this.registrationDto.getPhoneNumber_phoneCode() + " " + this.registrationDto.getPhoneNumber());
         com.authy.api.User user = users.createUser(this.registrationDto.getEmail(), this.registrationDto.getPhoneNumber(), this.registrationDto.getPhoneNumber_phoneCode());
 
         if (user.isOk()) {

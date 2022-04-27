@@ -13,11 +13,5 @@ import java.util.Optional;
 public interface VerificationTokenRepository  extends JpaRepository<VerificationToken, Long> {
 
     VerificationToken findByToken(Optional<String> token);
-
-
-    @Modifying
-    @Query("delete from VerificationToken t where t.expiryDate <= ?1")
-    void deleteAllExpiredSince(Date now);
-
-    //VerificationToken findByUser(TemporaryUser temporaryUser);
+    void deleteByExpiryDateLessThan(Date now);
 }

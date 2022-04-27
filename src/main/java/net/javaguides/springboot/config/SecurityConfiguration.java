@@ -72,11 +72,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/css/**",
                         "/img/**",
                         "/404").permitAll()
-                .antMatchers("/all-users").access("hasRole('ADMIN')")
+                .antMatchers("/all-users/**").access("hasRole('ADMIN')")
                 .antMatchers("/authyLogin", "/home", "/authyNotificationLogin").hasRole("PRE_USER")
                 .anyRequest().authenticated()
-                .and().exceptionHandling()
-                .accessDeniedPage("/404")
                 .and()
                 .formLogin()
                 .loginPage("/login")
@@ -117,7 +115,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                     RiskServerController riskServer = new RiskServerController();
 
-                    int riskValue = 2;  //.callRiskServer(date, ipAddress, country, operatingSystem, browser, browserVersion, authentication.getName(), "login");
+                    int riskValue = 1;  //.callRiskServer(date, ipAddress, country, operatingSystem, browser, browserVersion, authentication.getName(), "login");
 
                     User user = userService.findByEmail(authentication.getName());
 
@@ -150,9 +148,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .logoutSuccessHandler((httpServletRequest, httpServletResponse, authentication) -> {
                     httpServletRequest.getSession().invalidate();
                     httpServletResponse.sendRedirect("/login?logout");
-                }).and()
-                .exceptionHandling()
-                .accessDeniedPage("/404")
+                })
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)

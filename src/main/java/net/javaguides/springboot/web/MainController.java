@@ -1,39 +1,26 @@
 package net.javaguides.springboot.web;
 
 import com.authy.AuthyException;
-import com.twilio.Twilio;
-import com.twilio.rest.verify.v2.Service;
-import jdk.internal.instrumentation.Logger;
 import net.javaguides.springboot.model.Role;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.service.UserService;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.ws.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
-
-import com.authy.AuthyApiClient;
-import com.authy.api.*;
-import org.springframework.web.context.request.async.DeferredResult;
 
 @Controller
 public class MainController {
@@ -52,8 +39,7 @@ public class MainController {
 
         if (httpServletRequest.isUserInRole("ROLE_USER")) {
             return "redirect:/home";
-        }
-        else if (httpServletRequest.isUserInRole("ROLE_PRE_USER") && user.getUsingfa()) {
+        } else if (httpServletRequest.isUserInRole("ROLE_PRE_USER") && user.getUsingfa()) {
             return "redirect:/authyLogin";
         }
 
@@ -87,15 +73,36 @@ public class MainController {
 
     @GetMapping("/all-users")
     public String GetAllUsers(Model model, HttpServletRequest httpServletRequest) {
-        if (!httpServletRequest.isUserInRole("ROLE_ADMIN") && !httpServletRequest.isUserInRole("ROLE_USER")) {
+        if (httpServletRequest.isUserInRole("ROLE_ADMIN") && httpServletRequest.isUserInRole("ROLE_USER")) {
+            List<User> all_users = userService.allUsers();
+            List<Role> all_roles = userService.allRoles();
+            model.addAttribute("all_users", all_users);
+            model.addAttribute("roles", all_roles);
+            return "all-users";
+        } else {
             return "redirect:/home";
         }
+    }
 
-        List<User> all_users = userService.allUsers();
-        List<Role> all_roles = userService.allRoles();
-        model.addAttribute("all_users", all_users);
-        model.addAttribute("roles", all_roles);
-        return "all-users";
+    @GetMapping(value = "/all-users/{id}")
+    public String userInfo(@PathVariable("id") Long id, Model model, HttpServletRequest httpServletRequest) {
+        if (httpServletRequest.isUserInRole("ROLE_ADMIN") && httpServletRequest.isUserInRole("ROLE_USER")) {
+            User user = userService.findUserById(id);
+            List<Role> roles = userService.allRoles();
+            model.addAttribute("user", user);
+            model.addAttribute("listRoles", roles);
+            return "user-edit";
+        } else {
+            return "redirect:/home";
+        }
+    }
+
+    @PostMapping("/user/edit")
+    public String saveUser(User user) {
+        if(user.getId() != 1)
+            userService.save(user);
+
+        return "redirect:/all-users";
     }
 
     @GetMapping("/home")
@@ -109,7 +116,7 @@ public class MainController {
 
     }
 
-    @RequestMapping(value="/download/text", method= RequestMethod.GET)
+    @RequestMapping(value = "/download/text", method = RequestMethod.GET)
     public void downloadFile(HttpServletResponse httpServletResponse) throws IOException {
         Resource resource = resourceLoader.getResource("classpath:text_files/tp1.pdf");
         if (resource.exists()) {
@@ -123,7 +130,7 @@ public class MainController {
         }
     }
 
-    @RequestMapping(value="/download/sprint", method= RequestMethod.GET)
+    @RequestMapping(value = "/download/sprint", method = RequestMethod.GET)
     public void downloadSprint(HttpServletResponse httpServletResponse) throws IOException {
         Resource resource = resourceLoader.getResource("classpath:text_files/sprint.pdf");
         if (resource.exists()) {
