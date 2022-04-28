@@ -128,3 +128,9 @@
 #phoneNumber {
     width: calc(100% - 90px);
 }
+
+.invalid-feedback {
+    font-size:14px
+    font-weight:600
+    text-align:left
+}

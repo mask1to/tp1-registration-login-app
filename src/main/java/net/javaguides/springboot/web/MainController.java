@@ -3,7 +3,7 @@ package net.javaguides.springboot.web;
 import com.authy.AuthyException;
 import com.twilio.Twilio;
 import com.twilio.rest.verify.v2.Service;
-import jdk.internal.instrumentation.Logger;
+//import jdk.internal.instrumentation.Logger;
 import net.javaguides.springboot.model.Role;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.service.UserService;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.ws.Response;
+//import javax.xml.ws.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;

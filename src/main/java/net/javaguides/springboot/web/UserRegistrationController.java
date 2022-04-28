@@ -20,14 +20,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Date;
@@ -69,6 +69,7 @@ public class UserRegistrationController {
     }
 
     @RequestMapping(value = "/registration", method = RequestMethod.GET)
+    @GetMapping("/registration")
     public String showRegistrationForm(HttpServletRequest httpServletRequest, @RequestParam("token") Optional<String> token, Model model) {
         VerificationToken verificationToken = userService.getVerificationToken(token);
 
@@ -99,15 +100,24 @@ public class UserRegistrationController {
     }
 
     @RequestMapping(value = "/registration", method = RequestMethod.POST, params = "register")
-    public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto, RedirectAttributes redirectAttributes, Model model, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+    @PostMapping("/registration")
+    public String registerUserAccount(@Valid @ModelAttribute("user") UserRegistrationDto registrationDto,BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+
+        if(bindingResult.hasErrors()){
+            System.out.println("kkt");
+            return "/registration";
+        }
 
         User user = userService.findByEmail(registrationDto.getEmail());
+        System.out.println("kkts");
 
         if (user != null) {
+            System.out.println("kkta");
             model.addAttribute("error", "User already exists");
             model.addAttribute("token", registrationDto.getToken());
             model.addAttribute("email", registrationDto.getEmail());
             model.addAttribute("reg", "");
+            System.out.println("kktaa");
             return "/registration";
         }
 
@@ -117,9 +127,10 @@ public class UserRegistrationController {
             return "/registration";
         } else {
             if (userService.save(registrationDto, null) != null) {
+                System.out.println("kktvvv");
                 temporaryUserRepository.deleteTemporaryUserByEmail(registrationDto.getEmail());
                 redirectAttributes.addFlashAttribute("success", "Registration was successful. You can log in!");
-
+                System.out.println("kktaaaaaaaa");
                 java.util.Date date = java.util.Date.from(Instant.now());
                 String ipAddress = httpServletRequest.getRemoteAddr();
                 UserAgent userAgent = UserAgent.parseUserAgentString(httpServletRequest.getHeader("User-Agent"));
