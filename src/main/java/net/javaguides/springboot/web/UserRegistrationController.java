@@ -101,36 +101,58 @@ public class UserRegistrationController {
 
     @RequestMapping(value = "/registration", method = RequestMethod.POST, params = "register")
     @PostMapping("/registration")
-    public String registerUserAccount(@Valid @ModelAttribute("user") UserRegistrationDto registrationDto,BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+    public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto,BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
 
         if(bindingResult.hasErrors()){
-            System.out.println("kkt");
             return "/registration";
         }
 
-        User user = userService.findByEmail(registrationDto.getEmail());
-        System.out.println("kkts");
+        User user = userService.findByEmail(registrationDto.getEmail());;
 
         if (user != null) {
-            System.out.println("kkta");
             model.addAttribute("error", "User already exists");
             model.addAttribute("token", registrationDto.getToken());
             model.addAttribute("email", registrationDto.getEmail());
             model.addAttribute("reg", "");
-            System.out.println("kktaa");
             return "/registration";
         }
+
 
         if (registrationDto.isUsingfa()) {
             model.addAttribute("gaReg", "");
             this.registrationDto = registrationDto;
             return "/registration";
         } else {
+            if(registrationDto.getFirstName().length() < 2)
+            {
+                System.out.println("Kratke prve meno");
+                return "redirect:/login";
+            }
+            if(registrationDto.getLastName().length() < 2)
+            {
+                System.out.println("Kratke druhe meno");
+                return "redirect:/login";
+            }
+            String regexp = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
+            if(!registrationDto.getEmail().matches(regexp))
+            {
+                System.out.println("Zly mail");
+                return "redirect:/login";
+            }
+            if(registrationDto.getPassword().length() < 2)
+            {
+                System.out.println("Kratke heslo");
+                return "redirect:/login";
+            }
+            if(registrationDto.getPhoneNumber().length() < 10)
+            {
+                System.out.println("Zle cislo");
+                return "redirect:/login";
+            }
+
             if (userService.save(registrationDto, null) != null) {
-                System.out.println("kktvvv");
                 temporaryUserRepository.deleteTemporaryUserByEmail(registrationDto.getEmail());
                 redirectAttributes.addFlashAttribute("success", "Registration was successful. You can log in!");
-                System.out.println("kktaaaaaaaa");
                 java.util.Date date = java.util.Date.from(Instant.now());
                 String ipAddress = httpServletRequest.getRemoteAddr();
                 UserAgent userAgent = UserAgent.parseUserAgentString(httpServletRequest.getHeader("User-Agent"));
