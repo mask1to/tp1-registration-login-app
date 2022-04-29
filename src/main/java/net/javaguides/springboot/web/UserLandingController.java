@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/welcome")
@@ -58,6 +60,17 @@ public class UserLandingController
                 return "redirect:/welcome";
             }
             else {
+
+                String regexp = "^[A-Za-z0-9+_.-]+@(.+)$";
+                Pattern p = Pattern.compile(regexp);
+                Matcher m = p.matcher(userEmailDto.getEmail());
+                if(!m.matches())
+                {
+                    redirectAttributes.addAttribute("error3", "Email has a wrong form, please check it and enter a correct one");
+                    redirectAttributes.addAttribute("reg", "");
+                    redirectAttributes.addAttribute("email", userEmailDto.getEmail());
+                    return "redirect:/welcome";
+                }
                 String appUrl = request.getContextPath();
                 eventPublisher.publishEvent(new OnRegistrationCompleteEvent(temporaryUser,
                         request.getLocale(), appUrl));
