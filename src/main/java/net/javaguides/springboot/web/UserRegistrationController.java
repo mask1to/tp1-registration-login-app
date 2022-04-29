@@ -123,26 +123,56 @@ public class UserRegistrationController {
             this.registrationDto = registrationDto;
             return "/registration";
         } else {
+
             if(registrationDto.getFirstName().length() < 2 && registrationDto.getFirstName().length() > 30)
             {
+                System.out.println("zle meno");
                 model.addAttribute("error1", "First name length has to be 2 - 30 characters long");
+                model.addAttribute("reg", "");
+                model.addAttribute("token", registrationDto.getToken());
+                model.addAttribute("email", registrationDto.getEmail());
+                return "/registration";
             }
+
             if(registrationDto.getLastName().length() < 2 && registrationDto.getLastName().length() > 30)
             {
+                System.out.println("zle druhe meno");
                 model.addAttribute("error2", "Last name length has to be 2 - 30 characters long");
+                model.addAttribute("reg", "");
+                model.addAttribute("token", registrationDto.getToken());
+                model.addAttribute("email", registrationDto.getEmail());
+                return "/registration";
             }
+
             String regexp = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
             if(!registrationDto.getEmail().matches(regexp))
             {
+                System.out.println("zly mail");
                 model.addAttribute("error3", "Email has a wrong form, please check it and enter a correct one");
+                model.addAttribute("reg", "");
+                model.addAttribute("token", registrationDto.getToken());
+                model.addAttribute("email", registrationDto.getEmail());
+                return "/registration";
             }
+
             if(registrationDto.getPassword().length() < 6 && registrationDto.getPassword().length() > 30)
             {
+                System.out.println("zle heslo");
                 model.addAttribute("error4", "Password length has to be between 6 and 30 characters");
+                model.addAttribute("reg", "");
+                model.addAttribute("token", registrationDto.getToken());
+                model.addAttribute("email", registrationDto.getEmail());
+                return "/registration";
             }
+
             if(registrationDto.getPhoneNumber().length() < 10)
             {
+                System.out.println("zle cislo");
                 model.addAttribute("error5", "Phone number has to have 10 digits");
+                model.addAttribute("reg", "");
+                model.addAttribute("token", registrationDto.getToken());
+                model.addAttribute("email", registrationDto.getEmail());
+                return "/registration";
             }
 
             if (userService.save(registrationDto, null) != null) {
