@@ -50,10 +50,12 @@ public class MainController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByEmail(auth.getName());
 
-        if (httpServletRequest.isUserInRole("ROLE_USER")) {
+        if (httpServletRequest.isUserInRole("ROLE_USER"))
+        {
             return "redirect:/home";
         }
-        else if (httpServletRequest.isUserInRole("ROLE_PRE_USER") && user.getUsingfa()) {
+        else if (httpServletRequest.isUserInRole("ROLE_PRE_USER") && user.getUsingfa())
+        {
             return "redirect:/authyLogin";
         }
 
@@ -63,7 +65,8 @@ public class MainController {
     @GetMapping("/")
     public String index(HttpServletRequest httpServletRequest) throws AuthyException {
 
-        if (httpServletRequest.isUserInRole("ROLE_USER")) {
+        if (httpServletRequest.isUserInRole("ROLE_USER"))
+        {
             return "redirect:/home";
         }
 

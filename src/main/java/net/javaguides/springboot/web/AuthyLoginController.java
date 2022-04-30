@@ -73,14 +73,16 @@ public class AuthyLoginController {
         Tokens tokens = client.getTokens();
         Token response = tokens.verify(Integer.valueOf(user.getAuthyId()), secretCode.getSecret_code());
 
-        if (response.isOk()) {
-
+        if (response.isOk() && (secretCode.getSecret_code().length() == 7))
+        {
             List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(auth.getAuthorities());
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
             Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
             SecurityContextHolder.getContext().setAuthentication(newAuth);
             return "redirect:/";
-        } else {
+        }
+        else
+        {
             redirectAttributes.addFlashAttribute("error", response.getError());
             return "redirect:/authyLogin";
         }

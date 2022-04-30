@@ -142,8 +142,7 @@ public class UserRegistrationController {
                 + "(?=.*[@#$%^&+=])"
                 + "(?=\\S+$).{8,20}$";
         Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(registrationDto.getPassword());
-        System.out.println("Heslo: " + registrationDto.getPassword());
+
         if(!registrationDto.getPassword().matches(regex))
         {
             model.addAttribute("error4", "Password conditions: \n" +
@@ -158,7 +157,7 @@ public class UserRegistrationController {
             return "/registration";
         }
 
-        if(registrationDto.getPhoneNumber().length() < 10)
+        if(registrationDto.getPhoneNumber().length() != 9)
         {
             model.addAttribute("error5", "Phone number has to have 10 digits");
             model.addAttribute("reg", "");
