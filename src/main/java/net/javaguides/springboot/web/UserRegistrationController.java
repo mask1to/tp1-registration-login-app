@@ -157,9 +157,9 @@ public class UserRegistrationController {
             return "/registration";
         }
 
-        if(registrationDto.getPhoneNumber().length() != 9)
+        if(registrationDto.getPhoneNumber().length() < 5 || registrationDto.getPhoneNumber().length() > 11 || !registrationDto.getPhoneNumber().matches("[0-9]+"))
         {
-            model.addAttribute("error5", "Phone number has to have 10 digits");
+            model.addAttribute("error5", "Phone number needs to have atleast 6 and at most 11 digits");
             model.addAttribute("reg", "");
             model.addAttribute("token", registrationDto.getToken());
             model.addAttribute("email", registrationDto.getEmail());
