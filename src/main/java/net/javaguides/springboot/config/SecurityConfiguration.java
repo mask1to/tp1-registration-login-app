@@ -115,7 +115,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                     RiskServerController riskServer = new RiskServerController();
 
-                    int riskValue = 1;  //.callRiskServer(date, ipAddress, country, operatingSystem, browser, browserVersion, authentication.getName(), "login");
+                    int riskValue = 2;  //.callRiskServer(date, ipAddress, country, operatingSystem, browser, browserVersion, authentication.getName(), "login");
 
                     User user = userService.findByEmail(authentication.getName());
 
@@ -126,7 +126,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         return;
                     }
 
-                    if (user.getUsingfa() && riskValue >= 2) {
+                    if (riskValue == 2) {
+                        user.setShowRecognition(true);
+                        httpServletResponse.sendRedirect("/faceRecognition");
+                    }
+
+                    if (user.getUsingfa() && riskValue > 2) {
                         httpServletResponse.sendRedirect("/authyLogin");
                     }
                     else {

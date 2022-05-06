@@ -41,8 +41,13 @@ public class User
 
 	private String password;
 
+	private boolean showRecognition;
+
 	@Column(name = "enabled")
 	private boolean enabled;
+
+	@Column(name = "face_recognition")
+	private boolean faceRecognition;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE})
 	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
@@ -59,9 +64,11 @@ public class User
 		this.roles = roles;
 		this.Usingfa=Usingfa;
 		this.enabled = true;
+		this.faceRecognition = false;
 		this.phoneCode = phoneCode;
 		this.phoneNumber = phoneNumber;
 		this.authyId = authyId;
+		this.showRecognition = false;
 	}
 
 
@@ -165,6 +172,14 @@ public class User
 
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
+	}
+
+	public void setShowRecognition(boolean showRecognition) {
+		this.showRecognition = showRecognition;
+	}
+
+	public boolean getShowRecognition() {
+		return this.showRecognition;
 	}
 
 	@Override
