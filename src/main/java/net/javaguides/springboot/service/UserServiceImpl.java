@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User save(UserRegistrationDto registrationDto, String authyId) {
+    public User save(UserRegistrationDto registrationDto, String authyId, String resultFace) {
         Role pre_user = createRoleIfNotFound("ROLE_PRE_USER");
         User user = new User();
         user.setFirstName(registrationDto.getFirstName());
@@ -71,6 +71,13 @@ public class UserServiceImpl implements UserService {
         user.setPhoneCode(registrationDto.getPhoneNumber_phoneCode());
         user.setPhoneNumber(registrationDto.getPhoneNumber());
         user.setAuthyId(authyId);
+        user.setEnabled(true);
+        if (resultFace.equals("1")) {
+            user.setFaceRecognition(true);
+        }
+        else {
+            user.setFaceRecognition(false);
+        }
         return userRepository.save(user);
     }
 
@@ -207,6 +214,8 @@ public class UserServiceImpl implements UserService {
             user.setPhoneCode("+421");
             user.setPhoneNumber("910278653");
             user.setAuthyId("44401362");
+            user.setEnabled(true);
+            user.setFaceRecognition(true);
             userRepository.save(user);
         }
     }

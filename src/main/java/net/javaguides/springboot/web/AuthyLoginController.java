@@ -16,19 +16,17 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
-@RequestMapping("/authyLogin")
 public class AuthyLoginController {
     @Autowired
     ApplicationEventPublisher eventPublisher;
@@ -48,14 +46,15 @@ public class AuthyLoginController {
         return new SecretCode();
     }
 
-    @GetMapping
-    public String showLoginForm(HttpServletRequest httpServletRequest) {
+    @RequestMapping(value = "/authyLogin", method = RequestMethod.GET)
+    public String showLoginForm(HttpServletRequest httpServletRequest, @RequestParam("risk") String risk, Model model) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByEmail(auth.getName());
 
         if (httpServletRequest.isUserInRole("ROLE_PRE_USER") && user.getUsingfa()) {
-            return "authyLogin";
+            model.addAttribute("risk", risk);
+            return null;
         }
         else if (httpServletRequest.isUserInRole("ROLE_USER")) {
             return "redirect:/home";
@@ -64,7 +63,7 @@ public class AuthyLoginController {
         return "redirect:/";
     }
 
-    @PostMapping
+    @RequestMapping(value = "/authyLogin", method = RequestMethod.POST)
     public String loginUser(@ModelAttribute("user") SecretCode secretCode, HttpSession session, RedirectAttributes redirectAttributes) throws AuthyException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByEmail(auth.getName());
@@ -74,15 +73,21 @@ public class AuthyLoginController {
         Token response = tokens.verify(Integer.valueOf(user.getAuthyId()), secretCode.getSecret_code());
 
         if (response.isOk()) {
-
-            List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(auth.getAuthorities());
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
-            SecurityContextHolder.getContext().setAuthentication(newAuth);
-            return "redirect:/";
+            if (secretCode.getRisk().equals("2")) {
+                List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(auth.getAuthorities());
+                authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
+                SecurityContextHolder.getContext().setAuthentication(newAuth);
+                return "redirect:/";
+            }
+            else {
+                redirectAttributes.addFlashAttribute("email", user.getEmail());
+                return "redirect:/faceRecognition";
+            }
         } else {
             redirectAttributes.addFlashAttribute("error", response.getError());
-            return "redirect:/authyLogin";
+            redirectAttributes.addFlashAttribute("risk", secretCode.getRisk());
+            return "redirect:/authyLogin?risk=" + secretCode.getRisk();
         }
     }
 }

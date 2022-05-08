@@ -115,7 +115,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                     RiskServerController riskServer = new RiskServerController();
 
-                    int riskValue = 2;  //.callRiskServer(date, ipAddress, country, operatingSystem, browser, browserVersion, authentication.getName(), "login");
+                    int riskValue = 3; //riskServer.callRiskServer(date, ipAddress, country, operatingSystem, browser, browserVersion, authentication.getName(), "login");
 
                     User user = userService.findByEmail(authentication.getName());
 
@@ -125,14 +125,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         httpServletResponse.sendRedirect("/?blacklist");
                         return;
                     }
-
-                    if (riskValue == 2) {
-                        user.setShowRecognition(true);
-                        httpServletResponse.sendRedirect("/faceRecognition");
+                    else if (riskValue == 3 && user.isFaceRecognition() && user.getUsingfa()) {
+                        httpServletResponse.sendRedirect("/authyLogin?risk=3");
                     }
-
-                    if (user.getUsingfa() && riskValue > 2) {
-                        httpServletResponse.sendRedirect("/authyLogin");
+                    else if (user.getUsingfa() && riskValue == 2) {
+                        httpServletResponse.sendRedirect("/authyLogin?risk=2");
                     }
                     else {
                         httpServletRequest.getSession().setAttribute("principal_name", authentication.getName());

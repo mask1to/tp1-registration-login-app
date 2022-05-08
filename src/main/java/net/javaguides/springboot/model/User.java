@@ -41,8 +41,6 @@ public class User
 
 	private String password;
 
-	private boolean showRecognition;
-
 	@Column(name = "enabled")
 	private boolean enabled;
 
@@ -55,7 +53,7 @@ public class User
 
 	public User() {}
 
-	public User(String firstName, String lastName, String email, String password, boolean Usingfa, Set<Role> roles, String phoneCode, String phoneNumber, String authyId) {
+	public User(String firstName, String lastName, String email, String password, boolean Usingfa, Set<Role> roles, String phoneCode, String phoneNumber, String authyId, boolean faceRecognition) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -68,7 +66,7 @@ public class User
 		this.phoneCode = phoneCode;
 		this.phoneNumber = phoneNumber;
 		this.authyId = authyId;
-		this.showRecognition = false;
+		this.faceRecognition = faceRecognition;
 	}
 
 
@@ -174,12 +172,12 @@ public class User
 		this.roles = roles;
 	}
 
-	public void setShowRecognition(boolean showRecognition) {
-		this.showRecognition = showRecognition;
+	public boolean isFaceRecognition() {
+		return faceRecognition;
 	}
 
-	public boolean getShowRecognition() {
-		return this.showRecognition;
+	public void setFaceRecognition(boolean faceRecognition) {
+		this.faceRecognition = faceRecognition;
 	}
 
 	@Override

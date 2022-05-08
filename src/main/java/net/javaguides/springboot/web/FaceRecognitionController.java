@@ -1,6 +1,5 @@
 package net.javaguides.springboot.web;
 
-import com.authy.AuthyException;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,13 +39,16 @@ public class FaceRecognitionController {
         this.userService = userService;
     }
 
+    @Value( "${faceRecognition.url}" )
+    private String faceRecognitionUrl;
+
     @GetMapping
     public String showFaceRecognition(HttpServletRequest httpServletRequest) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByEmail(auth.getName());
 
-        if (httpServletRequest.isUserInRole("ROLE_PRE_USER") && user.getShowRecognition()) {
+        if (httpServletRequest.isUserInRole("ROLE_PRE_USER")) {
             return "faceRecognition";
         }
         else if (httpServletRequest.isUserInRole("ROLE_USER")) {
@@ -57,13 +60,22 @@ public class FaceRecognitionController {
 
     @PostMapping
     public String faceRecognition(RedirectAttributes redirectAttributes, Model model) throws InterruptedException {
-        System.out.println("HERE");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(auth.getAuthorities());
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
-        SecurityContextHolder.getContext().setAuthentication(newAuth);
-        return "redirect:/";
+        String uri = faceRecognitionUrl + "check_authentication?username=" + auth.getName();
+        RestTemplate restTemplate = new RestTemplate();
+        String result = restTemplate.getForObject(uri, String.class);
+
+        if(result.equals("1")) {
+            List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(auth.getAuthorities());
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
+            return "redirect:/";
+        }
+        else {
+            redirectAttributes.addFlashAttribute("error", "");
+            return "redirect:/faceRecognition";
+        }
     }
 }

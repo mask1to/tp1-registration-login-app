@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public interface UserService extends UserDetailsService {
 
-	User save(UserRegistrationDto registrationDto, String authyId);
+	User save(UserRegistrationDto registrationDto, String authyId, String resultFace);
 	User save(User user);
 	TemporaryUser saveEmail(UserEmailDto userEmailDto, RedirectAttributes redirectAttributes) throws ConstraintViolationException;
 	TemporaryUser getTemporaryUser(String verificationToken);

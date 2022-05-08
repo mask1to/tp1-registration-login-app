@@ -3,57 +3,35 @@
 <head th:replace="includes/header :: header" />
 <body>
 
-<div th:replace="includes/navbar :: navbar" />
-
 <section class="pt-4">
     <div class="container">
         <div class="row">
             <div class="col-md-6 col-md-offset-3">
-                <h1> User Login Page </h1>
-                <form th:action="@{/login}" method="post">
-
-                    <div class="alert alert-primary" role="alert" th:text="${success}" th:if="${success}"></div>
+                <h1>Face authentication</h1>
+                <form th:action="@{/faceReg}" method="post">
 
                     <div th:if="${param.error}">
-                        <div class="alert alert-danger">Invalid username or
-                            password.
+                        <div class="alert alert-danger">Authentication was not successful.
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="username"> Username </label> :
-                        <input type="text" class="form-control" id="username" name="username"
-                               placeholder="Enter Email ID" autofocus="autofocus">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password">Password</label>: <input type="password"
-                                                                       id="password" name="password" class="form-control"
-                                                                       placeholder="Enter Password"/>
-                    </div>
-                    <div class="form-group">
+                    <div class="form-group mt-3">
                         <div class="row">
                             <div class="col-sm-6 col-sm-offset-3">
-                                <input type="submit" name="login-submit" id="login-submit"
-                                       class="form-control btn btn-primary" value="Log In"/>
+                                <a href="https://recognition-be.onrender.com/" class="btn btn-primary">Face authentication</a>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+
+                    <div class="form-group mt-3">
                         <div class="row">
                             <div class="col-sm-6 col-sm-offset-3">
-                                <button class="btn btn-success"
-                                        onclick="window.open('https://recognition-service-be.herokuapp.com/#/?mode=1&user=' + document.getElementById('username').value,'_blank')"
-                                        name="registerFace" type="button">Authenticate via face recognition</button>
+                                <input type="submit" name="login-submit" id="login-submit"
+                                       class="form-control btn btn-success" value="Finish"/>
                             </div>
                         </div>
                     </div>
                 </form>
-
-                <div class="form-group">
-                    <span>New user? <a href="/" th:href="@{/welcome}">Register here</a></span>
-                </div>
-
             </div>
         </div>
     </div>

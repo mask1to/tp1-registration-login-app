@@ -24,8 +24,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -50,6 +52,9 @@ public class UserRegistrationController {
     @Value( "${authy.api}" )
     private String API_KEY;
 
+    @Value( "${faceRecognition.url}" )
+    private String faceRecognitionUrl;
+
     public UserRegistrationController(UserService userService, TemporaryUserRepository temporaryUserRepository, VerificationTokenRepository verificationTokenRepository) {
         super();
         this.userService = userService;
@@ -63,13 +68,17 @@ public class UserRegistrationController {
     }
 
     @RequestMapping(value = "/registration", method = RequestMethod.GET)
-    public String showRegistrationForm(HttpServletRequest httpServletRequest, @RequestParam("token") Optional<String> token, Model model) {
+    public String showRegistrationForm(HttpServletRequest httpServletRequest, @RequestParam("token") Optional<String> token, Model model) throws ServletException {
         VerificationToken verificationToken = userService.getVerificationToken(token);
 
         if (httpServletRequest.isUserInRole("ROLE_USER")) {
             return "redirect:/home";
         } else if (verificationToken == null) {
             return "/badToken";
+        }
+        else if (httpServletRequest.isUserInRole("ROLE_PRE_USER")){
+            httpServletRequest.logout();
+            return "redirect:/";
         }
 
         TemporaryUser temporaryUser = verificationToken.getTemporaryUser();
@@ -110,7 +119,11 @@ public class UserRegistrationController {
             this.registrationDto = registrationDto;
             return "/registration";
         } else {
-            if (userService.save(registrationDto, null) != null) {
+            String uri = faceRecognitionUrl + "check_registration?username=" + registrationDto.getEmail();
+            RestTemplate restTemplate = new RestTemplate();
+            String result = restTemplate.getForObject(uri, String.class);
+
+            if (userService.save(registrationDto, null, result) != null) {
                 temporaryUserRepository.deleteTemporaryUserByEmail(registrationDto.getEmail());
                 redirectAttributes.addFlashAttribute("success", "Registration was successful. You can log in!");
 
@@ -173,7 +186,10 @@ public class UserRegistrationController {
         com.authy.api.User user = users.createUser(this.registrationDto.getEmail(), this.registrationDto.getPhoneNumber(), this.registrationDto.getPhoneNumber_phoneCode());
 
         if (user.isOk()) {
-            userService.save(this.registrationDto, String.valueOf(user.getId()));
+            String uri = faceRecognitionUrl + "check_registration?username=" + registrationDto.getEmail();
+            RestTemplate restTemplate = new RestTemplate();
+            String result = restTemplate.getForObject(uri, String.class);
+            userService.save(this.registrationDto, String.valueOf(user.getId()), result);
             temporaryUserRepository.deleteTemporaryUserByEmail(this.registrationDto.getEmail());
             redirectAttributes.addFlashAttribute("success", "Registration was successful. You can log in!");
             return "redirect:/login";

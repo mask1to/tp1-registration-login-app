@@ -9,6 +9,7 @@ import com.authy.api.Tokens;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.repository.VerificationTokenRepository;
 import net.javaguides.springboot.service.UserService;
+import net.javaguides.springboot.web.dto.RiskValue;
 import net.javaguides.springboot.web.dto.SecretCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,10 +30,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @EnableAsync
-@RequestMapping("/authyNotificationLogin")
 public class AuthyNotificationLoginController {
     @Autowired
     ApplicationEventPublisher eventPublisher;
@@ -47,14 +48,20 @@ public class AuthyNotificationLoginController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public String showPage(HttpServletRequest httpServletRequest, RedirectAttributes redirectAttributes) throws AuthyException, InterruptedException {
+    @ModelAttribute("user")
+    public RiskValue riskValue() {
+        return new RiskValue();
+    }
+
+    @RequestMapping(value = "/authyNotificationLogin", method = RequestMethod.GET)
+    public String showPage(HttpServletRequest httpServletRequest, RedirectAttributes redirectAttributes, @RequestParam("risk") String risk, Model model) throws AuthyException, InterruptedException {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByEmail(auth.getName());
 
         if (httpServletRequest.isUserInRole("ROLE_PRE_USER") && user.getUsingfa()) {
-            return "authyNotificationLogin";
+            model.addAttribute("risk", risk);
+            return null;
         }
         else if (httpServletRequest.isUserInRole("ROLE_USER")) {
             return "redirect:/home";
@@ -63,8 +70,8 @@ public class AuthyNotificationLoginController {
         return "redirect:/";
     }
 
-    @PostMapping
-    public String notification(RedirectAttributes redirectAttributes, Model model) throws AuthyException, InterruptedException {
+    @RequestMapping(value = "/authyNotificationLogin", method = RequestMethod.POST)
+    public String notification(@ModelAttribute("user") RiskValue riskValue, RedirectAttributes redirectAttributes, Model model, HttpServletRequest httpServletRequest) throws AuthyException, InterruptedException {
         model.addAttribute("disabled", true);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByEmail(auth.getName());
@@ -89,17 +96,23 @@ public class AuthyNotificationLoginController {
 
                 if(responseNotification.getApprovalRequest().getStatus().equals("expired") || responseNotification.getApprovalRequest().getStatus().equals("denied")) {
                     redirectAttributes.addFlashAttribute("error", "Notification expired or was denied!");
-                    return "redirect:/authyNotificationLogin";
+                    return "redirect:/authyNotificationLogin?risk=" + riskValue.getRisk();
                 }
             }
-            List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(auth.getAuthorities());
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
-            SecurityContextHolder.getContext().setAuthentication(newAuth);
-            return "redirect:/";
+            if (riskValue.getRisk().equals("2")) {
+                List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(auth.getAuthorities());
+                authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
+                SecurityContextHolder.getContext().setAuthentication(newAuth);
+                return "redirect:/";
+            }
+            else {
+                redirectAttributes.addFlashAttribute("email", user.getEmail());
+                return "redirect:/faceRecognition";
+            }
         } else {
             redirectAttributes.addFlashAttribute("error", response.getError());
-            return "redirect:/authyNotificationLogin";
+            return "redirect:/authyNotificationLogin?risk=" + riskValue.getRisk();
         }
     }
 }
