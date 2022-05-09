@@ -75,6 +75,7 @@ public class FaceRecognitionController {
         }
         else {
             redirectAttributes.addFlashAttribute("error", "");
+            redirectAttributes.addFlashAttribute("email", auth.getName());
             return "redirect:/faceRecognition";
         }
     }
