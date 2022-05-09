@@ -1,6 +1,9 @@
 package net.javaguides.springboot.web;
 
 import com.authy.AuthyException;
+import com.twilio.Twilio;
+import com.twilio.rest.verify.v2.Service;
+//import jdk.internal.instrumentation.Logger;
 import net.javaguides.springboot.model.Role;
 import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.service.UserService;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+//import javax.xml.ws.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -38,7 +42,8 @@ public class MainController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByEmail(auth.getName());
 
-        if (httpServletRequest.isUserInRole("ROLE_USER")) {
+        if (httpServletRequest.isUserInRole("ROLE_USER"))
+        {
             return "redirect:/home";
         } else if (httpServletRequest.isUserInRole("ROLE_PRE_USER") && user.getUsingfa()) {
             httpServletRequest.logout();
@@ -51,7 +56,8 @@ public class MainController {
     @GetMapping("/")
     public String index(HttpServletRequest httpServletRequest) throws AuthyException {
 
-        if (httpServletRequest.isUserInRole("ROLE_USER")) {
+        if (httpServletRequest.isUserInRole("ROLE_USER"))
+        {
             return "redirect:/home";
         }
 

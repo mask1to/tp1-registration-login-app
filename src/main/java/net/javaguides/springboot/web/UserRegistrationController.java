@@ -26,11 +26,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Date;
@@ -39,6 +43,8 @@ import java.time.Instant;
 import java.util.Calendar;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Controller
@@ -105,9 +111,14 @@ public class UserRegistrationController {
     }
 
     @RequestMapping(value = "/registration", method = RequestMethod.POST, params = "register")
-    public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto, RedirectAttributes redirectAttributes, Model model, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+    @PostMapping("/registration")
+    public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto,BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
 
-        User user = userService.findByEmail(registrationDto.getEmail());
+        if(bindingResult.hasErrors()){
+            return "/registration";
+        }
+
+        User user = userService.findByEmail(registrationDto.getEmail());;
 
         if (user != null) {
             model.addAttribute("error", "User already exists");
@@ -117,7 +128,55 @@ public class UserRegistrationController {
             return "/registration";
         }
 
-        if (registrationDto.isUsingfa()) {
+        if(registrationDto.getFirstName().length() < 2 || registrationDto.getFirstName().length() > 30)
+        {
+            model.addAttribute("error1", "First name length has to be 2-30 characters long");
+            model.addAttribute("reg", "");
+            model.addAttribute("token", registrationDto.getToken());
+            model.addAttribute("email", registrationDto.getEmail());
+            return "/registration";
+        }
+
+        if(registrationDto.getLastName().length() < 2 || registrationDto.getLastName().length() > 30)
+        {
+            model.addAttribute("error2", "Last name length has to be 2-30 characters long");
+            model.addAttribute("reg", "");
+            model.addAttribute("token", registrationDto.getToken());
+            model.addAttribute("email", registrationDto.getEmail());
+            return "/registration";
+        }
+
+        String regex = "^(?=.*[0-9])"
+                + "(?=.*[a-z])(?=.*[A-Z])"
+                + "(?=.*[@#$%^&+=])"
+                + "(?=\\S+$).{8,20}$";
+        Pattern p = Pattern.compile(regex);
+
+        if(!registrationDto.getPassword().matches(regex))
+        {
+            model.addAttribute("error4", "Password conditions: \n" +
+                                               "- min. 8 characters long\n" +
+                                               "- 1 upper alpha char \n" +
+                                               "- 1 lower alpha char\n" +
+                                               "- 1 digit\n" +
+                                               "- 1 special char");
+            model.addAttribute("reg", "");
+            model.addAttribute("token", registrationDto.getToken());
+            model.addAttribute("email", registrationDto.getEmail());
+            return "/registration";
+        }
+
+        if(registrationDto.getPhoneNumber().length() < 5 || registrationDto.getPhoneNumber().length() > 11 || !registrationDto.getPhoneNumber().matches("[0-9]+"))
+        {
+            model.addAttribute("error5", "Phone number needs to have atleast 6 and at most 11 digits");
+            model.addAttribute("reg", "");
+            model.addAttribute("token", registrationDto.getToken());
+            model.addAttribute("email", registrationDto.getEmail());
+            return "/registration";
+        }
+
+        if (registrationDto.isUsingfa())
+        {
             model.addAttribute("gaReg", "");
             this.registrationDto = registrationDto;
             return "/registration";
@@ -129,7 +188,6 @@ public class UserRegistrationController {
             if (userService.save(registrationDto, null, result) != null) {
                 temporaryUserRepository.deleteTemporaryUserByEmail(registrationDto.getEmail());
                 redirectAttributes.addFlashAttribute("success", "Registration was successful. You can log in!");
-
                 java.util.Date date = java.util.Date.from(Instant.now());
                 String ipAddress = httpServletRequest.getRemoteAddr();
                 UserAgent userAgent = UserAgent.parseUserAgentString(httpServletRequest.getHeader("User-Agent"));

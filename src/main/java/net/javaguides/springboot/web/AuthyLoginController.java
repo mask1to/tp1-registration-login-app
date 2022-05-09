@@ -72,7 +72,7 @@ public class AuthyLoginController {
         Tokens tokens = client.getTokens();
         Token response = tokens.verify(Integer.valueOf(user.getAuthyId()), secretCode.getSecret_code());
 
-        if (response.isOk()) {
+        if (response.isOk() && (secretCode.getSecret_code().length() == 7)) {
             if (secretCode.getRisk().equals("2")) {
                 List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(auth.getAuthorities());
                 authorities.add(new SimpleGrantedAuthority("ROLE_USER"));

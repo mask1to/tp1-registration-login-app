@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 
 @Entity
 @Table(name="users", uniqueConstraints={@UniqueConstraint(columnNames={"email"})})
@@ -18,9 +19,11 @@ public class User
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@NotNull
 	@Column(name = "first_name")
 	private String firstName;
 
+	@NotNull
 	@Column(name = "last_name")
 	private String lastName;
 
@@ -39,6 +42,7 @@ public class User
 	@Column(name = "authy_id")
 	private String authyId;
 
+	@NotNull
 	private String password;
 
 	@Column(name = "enabled")
