@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class MainController {
     UserService userService;
 
     @GetMapping("/login")
-    public String login(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public String login(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByEmail(auth.getName());
@@ -40,7 +41,8 @@ public class MainController {
         if (httpServletRequest.isUserInRole("ROLE_USER")) {
             return "redirect:/home";
         } else if (httpServletRequest.isUserInRole("ROLE_PRE_USER") && user.getUsingfa()) {
-            return "redirect:/authyLogin";
+            httpServletRequest.logout();
+            return "redirect:/";
         }
 
         return "login";

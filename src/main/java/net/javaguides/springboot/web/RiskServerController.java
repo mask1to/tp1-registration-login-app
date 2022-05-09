@@ -19,7 +19,7 @@ public class RiskServerController {
 
     Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
 
-    public int callRiskServer(Date date, String ipAddress, String country, String operatingSystem, String browser, Version browserVersion, String email, String transaction) {
+    public int callRiskServer(String date, String ipAddress, String country, String operatingSystem, String browser, String browserVersion, String email, String transaction) {
         String url = "https://serene-refuge-96326.herokuapp.com/oauth/token?scope=write&grant_type=password&username=foo&password=foo";
 //        String url = "http://localhost:8080/oauth/token?scope=write&grant_type=password&username=foo&password=foo";
         RestTemplate rt = new RestTemplate();

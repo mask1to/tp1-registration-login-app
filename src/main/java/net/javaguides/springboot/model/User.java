@@ -44,13 +44,16 @@ public class User
 	@Column(name = "enabled")
 	private boolean enabled;
 
+	@Column(name = "face_recognition")
+	private boolean faceRecognition;
+
 	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE})
 	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
 	private Set<Role> roles = new HashSet<>();
 
 	public User() {}
 
-	public User(String firstName, String lastName, String email, String password, boolean Usingfa, Set<Role> roles, String phoneCode, String phoneNumber, String authyId) {
+	public User(String firstName, String lastName, String email, String password, boolean Usingfa, Set<Role> roles, String phoneCode, String phoneNumber, String authyId, boolean faceRecognition) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -59,9 +62,11 @@ public class User
 		this.roles = roles;
 		this.Usingfa=Usingfa;
 		this.enabled = true;
+		this.faceRecognition = false;
 		this.phoneCode = phoneCode;
 		this.phoneNumber = phoneNumber;
 		this.authyId = authyId;
+		this.faceRecognition = faceRecognition;
 	}
 
 
@@ -165,6 +170,14 @@ public class User
 
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
+	}
+
+	public boolean isFaceRecognition() {
+		return faceRecognition;
+	}
+
+	public void setFaceRecognition(boolean faceRecognition) {
+		this.faceRecognition = faceRecognition;
 	}
 
 	@Override

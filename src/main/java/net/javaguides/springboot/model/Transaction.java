@@ -7,17 +7,17 @@ import java.util.Date;
 
 public class Transaction {
 
-    Date datum;
+    String datum;
     String ipAdresa;
     String pozadovanaTransakcia;
     String krajina;
     String operatingSystem;
     String browser;
-    Version browserVersion;
+    String browserVersion;
     String email;
 
 
-    public Transaction(Date datum, String ipAdresa, String pozadovanaTransakcia, String krajina, String operatingSystem, String browser, Version browserVersion, String email) {
+    public Transaction(String datum, String ipAdresa, String pozadovanaTransakcia, String krajina, String operatingSystem, String browser, String browserVersion, String email) {
         this.datum = datum;
         this.ipAdresa = ipAdresa;
         this.pozadovanaTransakcia = pozadovanaTransakcia;
@@ -28,11 +28,11 @@ public class Transaction {
         this.email = email;
     }
 
-    public Date getDatum() {
+    public String getDatum() {
         return datum;
     }
 
-    public void setDatum(Date datum) {
+    public void setDatum(String datum) {
         this.datum = datum;
     }
 
@@ -76,11 +76,11 @@ public class Transaction {
         this.browser = browser;
     }
 
-    public Version getBrowserVersion() {
+    public String getBrowserVersion() {
         return browserVersion;
     }
 
-    public void setBrowserVersion(Version browserVersion) {
+    public void setBrowserVersion(String browserVersion) {
         this.browserVersion = browserVersion;
     }
 
