@@ -28,10 +28,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 @Configuration
 @EnableAsync
@@ -85,7 +87,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     String ipAddress = httpServletRequest.getRemoteAddr();
                     UserAgent userAgent = UserAgent.parseUserAgentString(httpServletRequest.getHeader("User-Agent"));
                     String browser = userAgent.getBrowser().getName();
-                    Version browserVersion = userAgent.getBrowserVersion();
+                    String browserVersion = userAgent.getBrowserVersion().toString();
                     String browserDetails = httpServletRequest.getHeader("User-Agent");
                     String userAgent1 = browserDetails;
                     String operatingSystem;
@@ -115,7 +117,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                     RiskServerController riskServer = new RiskServerController();
 
-                    int riskValue = 3; //riskServer.callRiskServer(date, ipAddress, country, operatingSystem, browser, browserVersion, authentication.getName(), "login");
+                    SimpleDateFormat sdf;
+                    sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+                    sdf.setTimeZone(TimeZone.getTimeZone("CET"));
+                    String dateText = sdf.format(date);
+
+                    int riskValue = riskServer.callRiskServer(dateText, ipAddress, country, operatingSystem, browser, browserVersion, authentication.getName(), "login");
 
                     User user = userService.findByEmail(authentication.getName());
 
@@ -125,7 +132,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         httpServletResponse.sendRedirect("/?blacklist");
                         return;
                     }
-                    else if (riskValue == 3 && user.isFaceRecognition() && user.getUsingfa()) {
+                    else if (riskValue == 3 && user.isFaceRecognition() && user.isUsingfa()) {
                         httpServletResponse.sendRedirect("/authyLogin?risk=3");
                     }
                     else if (user.getUsingfa() && riskValue == 2) {

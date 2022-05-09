@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -33,9 +34,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.Optional;
+import java.util.TimeZone;
 
 
 @Controller
@@ -131,7 +134,7 @@ public class UserRegistrationController {
                 String ipAddress = httpServletRequest.getRemoteAddr();
                 UserAgent userAgent = UserAgent.parseUserAgentString(httpServletRequest.getHeader("User-Agent"));
                 String browser = userAgent.getBrowser().getName();
-                Version browserVersion = userAgent.getBrowserVersion();
+                String browserVersion = userAgent.getBrowserVersion().toString();
                 String browserDetails = httpServletRequest.getHeader("User-Agent");
                 String userAgent1 = browserDetails;
                 String operatingSystem;
@@ -158,15 +161,21 @@ public class UserRegistrationController {
                 } catch (NullPointerException e) {
                     country = "No country";
                 }
-                RiskServerController riskServer = new RiskServerController();
-                //int riskValue = riskServer.callRiskServer(date, ipAddress, country, operatingSystem, browser, browserVersion, registrationDto.getEmail(), "registration");
 
-                /*if(riskValue == 4) {
+                SimpleDateFormat sdf;
+                sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+                sdf.setTimeZone(TimeZone.getTimeZone("CET"));
+                String dateText = sdf.format(date);
+
+                RiskServerController riskServer = new RiskServerController();
+                int riskValue = riskServer.callRiskServer(dateText, ipAddress, country, operatingSystem, browser, browserVersion, registrationDto.getEmail(), "registration");
+
+                if(riskValue == 4) {
                     SecurityContextLogoutHandler securityContextLogoutHandler = new SecurityContextLogoutHandler();
                     securityContextLogoutHandler.logout(httpServletRequest, httpServletResponse, null);
                     httpServletResponse.sendRedirect("/?blacklist");
                     return null;
-                }*/
+                }
 
                 return "redirect:/login";
             } else {
