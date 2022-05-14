@@ -81,6 +81,6 @@ public class UserLandingController
             return "redirect:/welcome";
         }
         redirectAttributes.addFlashAttribute("success", "Email has been sent.");
-        return "redirect:/";
+        return "redirect:/login";
     }
 }

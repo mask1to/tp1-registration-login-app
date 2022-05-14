@@ -124,23 +124,9 @@ public class MainController {
 
     }
 
-    @RequestMapping(value = "/download/text", method = RequestMethod.GET)
+    @RequestMapping(value = "/download", method = RequestMethod.GET)
     public void downloadFile(HttpServletResponse httpServletResponse) throws IOException {
-        Resource resource = resourceLoader.getResource("classpath:text_files/tp1.pdf");
-        if (resource.exists()) {
-            httpServletResponse.setContentType("application/pdf");
-            httpServletResponse.setHeader("Content-Disposition",
-                    String.format("attachment; filename=" +
-                            resource.getFilename()));
-            httpServletResponse.setContentLength((int) resource.contentLength());
-            InputStream inputStream = resource.getInputStream();
-            FileCopyUtils.copy(inputStream, httpServletResponse.getOutputStream());
-        }
-    }
-
-    @RequestMapping(value = "/download/sprint", method = RequestMethod.GET)
-    public void downloadSprint(HttpServletResponse httpServletResponse) throws IOException {
-        Resource resource = resourceLoader.getResource("classpath:text_files/sprint.pdf");
+        Resource resource = resourceLoader.getResource("classpath:text_files/tp2.pdf");
         if (resource.exists()) {
             httpServletResponse.setContentType("application/pdf");
             httpServletResponse.setHeader("Content-Disposition",

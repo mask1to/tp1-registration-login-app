@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -24,8 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@EnableAsync
-@RequestMapping("/faceRecognition")
 public class FaceRecognitionController {
 
     @Autowired
@@ -42,7 +41,7 @@ public class FaceRecognitionController {
     @Value( "${faceRecognition.url}" )
     private String faceRecognitionUrl;
 
-    @GetMapping
+    @RequestMapping(value = "/faceRecognition", method = RequestMethod.GET)
     public String showFaceRecognition(HttpServletRequest httpServletRequest) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -58,7 +57,7 @@ public class FaceRecognitionController {
         return "redirect:/";
     }
 
-    @PostMapping
+    @RequestMapping(value = "/faceRecognition", method = RequestMethod.POST)
     public String faceRecognition(RedirectAttributes redirectAttributes, Model model) throws InterruptedException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 

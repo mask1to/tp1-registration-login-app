@@ -5,7 +5,7 @@
 
 <div th:replace="includes/navbar :: navbar"/>
 
-<section id="team" class="team_member section-padding pt-4">
+<section id="team" class="team_member section-padding pt-4 pb-4">
     <div class="container">
         <div class="row">
             <div class="col-12 mt-4">
@@ -125,20 +125,7 @@
             <div class="col-12 col-sm-6">
                 <div class="section-title">
                     <h1>Písomná práca</h1>
-                    <a href="/download/text" class="btn btn-primary">Stiahnúť súbor</a>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6">
-                <div class="section-title">
-                    <h1>Výpis taskov</h1>
-                    <a href="/download/sprint" class="btn btn-primary">Stiahnúť súbor</a>
-                </div>
-            </div>
-            <div class="col-12 mt-5">
-                <div class="section-title">
-                    <h1>Vývoj práce na Gite</h1>
-                    <img th:src="@{img/contributors.png}"
-                         alt="contributors" width="100%">
+                    <a th:href="@{/download}" class="btn btn-primary">Stiahnúť súbor</a>
                 </div>
             </div>
         </div>

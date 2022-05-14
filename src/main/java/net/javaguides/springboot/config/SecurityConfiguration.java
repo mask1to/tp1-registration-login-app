@@ -73,7 +73,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/js/**",
                         "/css/**",
                         "/img/**",
-                        "/404").permitAll()
+                        "/404",
+                        "/badToken",
+                        "/download").permitAll()
                 .antMatchers("/all-users/**").access("hasRole('ADMIN')")
                 .antMatchers("/authyLogin", "/home", "/authyNotificationLogin").hasRole("PRE_USER")
                 .anyRequest().authenticated()
