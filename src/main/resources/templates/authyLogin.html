@@ -14,7 +14,7 @@
                 <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
                 <form th:action="@{/authyLogin}" method="post" th:object="${user}">
                     <div class="form-group">
-                        <input type="hidden" th:value="${risk}" th:field="*{risk}">
+                        <input type="hidden" th:value="${risk}" th:name="risk">
                         <label class="control-label" for="secret_code"> Code from Authy: </label>
                         <input id="secret_code" class="form-control" th:field="*{secret_code}"
                                required autofocus="autofocus"/>

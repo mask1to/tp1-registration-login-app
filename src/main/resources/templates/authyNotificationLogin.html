@@ -14,7 +14,7 @@
                 <div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
                 <h3>Please click button to send notification</h3>
                 <form th:action="@{/authyNotificationLogin}" method="post" th:object="${user}">
-                    <input type="hidden" th:value="${risk}" th:field="*{risk}">
+                    <input type="hidden" th:value="${risk}" th:name="risk">
                     <div class="form-group">
                         <button type="submit" class="btn btn-success">Send notification</button>
                     </div>
